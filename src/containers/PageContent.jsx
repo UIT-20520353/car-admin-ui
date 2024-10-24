@@ -1,0 +1,52 @@
+import { Suspense, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
+import { Navigate, Route, Routes } from "react-router-dom";
+import RentManagement from "../features/rent";
+import Header from "./Header";
+import SuspenseContent from "./SuspenseContent";
+// import routes from "../routes";
+
+function PageContent() {
+  const mainContentRef = useRef(null);
+  const { pageTitle } = useSelector((state) => state.header);
+
+  // Scroll back to top on new page load
+  useEffect(() => {
+    mainContentRef.current.scroll({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [pageTitle]);
+
+  return (
+    <div className="flex flex-col drawer-content">
+      <Header />
+      <main
+        className="flex-1 px-6 pt-4 overflow-y-auto md:pt-4 bg-base-200"
+        ref={mainContentRef}
+      >
+        <Suspense fallback={<SuspenseContent />}>
+          <Routes>
+            <Route index element={<RentManagement />} />
+            {/* {routes.map((route, key) => {
+              return (
+                <Route
+                  key={key}
+                  exact={true}
+                  path={`${route.path}`}
+                  element={<route.component />}
+                />
+              );
+            })} */}
+
+            {/* Redirecting unknown url to 404 page */}
+            <Route path="*" element={<Navigate to="/404" />} />
+          </Routes>
+        </Suspense>
+        <div className="h-16"></div>
+      </main>
+    </div>
+  );
+}
+
+export default PageContent;
