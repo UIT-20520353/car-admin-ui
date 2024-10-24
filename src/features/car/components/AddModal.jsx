@@ -40,7 +40,7 @@ const AddModal = ({ open, size, onClose }) => {
           ✕
         </button>
         <h3 className="pb-4 text-2xl font-semibold text-center">
-          Add Payment Receipt
+          Add Car Contract
         </h3>
 
         <div className="w-full">
@@ -67,63 +67,35 @@ const AddModal = ({ open, size, onClose }) => {
                 </div>
 
                 <div className="flex flex-col items-start w-full gap-1">
-                  <label className="ml-3 text-base font-medium">
-                    Late days
-                  </label>
+                  <label className="ml-3 text-base font-medium">Email</label>
                   <input
-                    type="number"
+                    type="text"
                     className="w-full input input-bordered"
-                    placeholder="Enter late days"
-                    min={0}
+                    placeholder="Enter email"
                   />
                 </div>
               </div>
 
               <div className="grid w-full grid-cols-2 gap-3">
                 <div className="flex flex-col items-start w-full gap-1">
-                  <label className="ml-3 text-base font-medium">Status</label>
-                  <select className="w-full select select-bordered">
-                    <option disabled selected>
-                      Select status
-                    </option>
-                    <option>On time</option>
-                    <option>Late</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col items-start w-full gap-1">
-                  <label className="ml-3 text-base font-medium">Payment</label>
-                  <select className="w-full select select-bordered">
-                    <option disabled selected>
-                      Select payment method
-                    </option>
-                    <option>Cash</option>
-                    <option>Bank</option>
-                    <option>Square</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid w-full grid-cols-2 gap-3">
-                <div className="flex flex-col items-start w-full gap-1">
-                  <label className="ml-3 text-base font-medium">Fee Type</label>
-                  <select className="w-full select select-bordered">
-                    <option disabled selected>
-                      Select fee type
-                    </option>
-                    <option>Rental Fee</option>
-                    <option>Late Fee</option>
-                    <option>Accident Fee</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col items-start w-full gap-1">
-                  <label className="ml-3 text-base font-medium">Amount</label>
+                  <label className="ml-3 text-base font-medium">
+                    Customer name
+                  </label>
                   <input
-                    type="number"
+                    type="text"
                     className="w-full input input-bordered"
-                    placeholder="Enter amount"
-                    min={0}
+                    placeholder="Enter customer name"
+                  />
+                </div>
+
+                <div className="flex flex-col items-start w-full gap-1">
+                  <label className="ml-3 text-base font-medium">
+                    Customer phone
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full input input-bordered"
+                    placeholder="Enter customer phone"
                   />
                 </div>
               </div>

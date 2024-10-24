@@ -4,6 +4,9 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import RentManagement from "../features/rent";
 import Header from "./Header";
 import SuspenseContent from "./SuspenseContent";
+import ContractPage from "../features/contract";
+import CarManagement from "../features/car";
+import IncomeOutcomePage from "../features/income";
 // import routes from "../routes";
 
 function PageContent() {
@@ -27,6 +30,9 @@ function PageContent() {
       >
         <Suspense fallback={<SuspenseContent />}>
           <Routes>
+            <Route path="/cars" element={<CarManagement />} />
+            <Route path="/contracts" element={<ContractPage />} />
+            <Route path="/income-outcome" element={<IncomeOutcomePage />} />
             <Route index element={<RentManagement />} />
             {/* {routes.map((route, key) => {
               return (

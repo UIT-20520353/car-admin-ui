@@ -1,22 +1,8 @@
 /** Icons are imported separatly to reduce build time */
-import ArrowRightOnRectangleIcon from "@heroicons/react/24/outline/ArrowRightOnRectangleIcon";
-import BoltIcon from "@heroicons/react/24/outline/BoltIcon";
-import CalendarDaysIcon from "@heroicons/react/24/outline/CalendarDaysIcon";
-import ChartBarIcon from "@heroicons/react/24/outline/ChartBarIcon";
-import CodeBracketSquareIcon from "@heroicons/react/24/outline/CodeBracketSquareIcon";
-import Cog6ToothIcon from "@heroicons/react/24/outline/Cog6ToothIcon";
 import CurrencyDollarIcon from "@heroicons/react/24/outline/CurrencyDollarIcon";
-import DocumentDuplicateIcon from "@heroicons/react/24/outline/DocumentDuplicateIcon";
-import DocumentIcon from "@heroicons/react/24/outline/DocumentIcon";
 import DocumentTextIcon from "@heroicons/react/24/outline/DocumentTextIcon";
-import ExclamationTriangleIcon from "@heroicons/react/24/outline/ExclamationTriangleIcon";
-import InboxArrowDownIcon from "@heroicons/react/24/outline/InboxArrowDownIcon";
-import KeyIcon from "@heroicons/react/24/outline/KeyIcon";
-import Squares2X2Icon from "@heroicons/react/24/outline/Squares2X2Icon";
-import TableCellsIcon from "@heroicons/react/24/outline/TableCellsIcon";
-import UserIcon from "@heroicons/react/24/outline/UserIcon";
-import UsersIcon from "@heroicons/react/24/outline/UsersIcon";
-import WalletIcon from "@heroicons/react/24/outline/WalletIcon";
+import TruckIcon from "@heroicons/react/24/outline/TruckIcon";
+import ArrowTrendingUpIcon from "@heroicons/react/24/outline/ArrowTrendingUpIcon";
 
 const iconClasses = `h-6 w-6`;
 const submenuIconClasses = `h-5 w-5`;
@@ -26,6 +12,21 @@ const routes = [
     path: "/",
     icon: <CurrencyDollarIcon className={iconClasses} />,
     name: "Rental Payment Management",
+  },
+  {
+    path: "/contracts",
+    icon: <DocumentTextIcon className={iconClasses} />,
+    name: "Contract Management",
+  },
+  {
+    path: "/cars",
+    icon: <TruckIcon className={iconClasses} />,
+    name: "Car Management",
+  },
+  {
+    path: "/income-outcome",
+    icon: <ArrowTrendingUpIcon className={iconClasses} />,
+    name: "Income & Outcome",
   },
   // {
   //   path: "/app/dashboard",
