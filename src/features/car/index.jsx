@@ -1,11 +1,13 @@
 import Pencil from "@heroicons/react/24/outline/PencilIcon";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
 import SearchBar from "../../components/Input/SearchBar";
 import { getCars, selectCarState } from "../../redux/carSlice";
 import { setPageTitle } from "../common/headerSlice";
 import AddModal from "./components/AddModal";
+import EditModal from "./components/EditModal";
+import Pagination from "../../components/pagination";
 
 const TopSideButtons = ({ onOpenAddModal }) => {
   return (
@@ -24,8 +26,9 @@ function CarManagement() {
   const dispatch = useDispatch();
   const { cars } = useSelector(selectCarState);
   const [isOpenAddModal, setOpenAddModal] = useState(false);
-  const [searchText, setSearchText] = useState("");
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
+  const [selectedCar, setSelectedCar] = useState(null);
+  const [filter, setFilter] = useState({ name: "" });
 
   const onOpenAddModal = () => setOpenAddModal(true);
 
@@ -52,15 +55,24 @@ function CarManagement() {
     }
   };
 
+  const onReset = () => {
+    setPagination({ page: 0, size: 10 });
+    setFilter({ name: "" });
+  };
+
+  const fetchCars = useCallback(() => {
+    dispatch(getCars({ pagination, filter }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination]);
+
   useEffect(() => {
     dispatch(setPageTitle({ title: "Car Management" }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    dispatch(getCars(pagination));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination]);
+    fetchCars();
+  }, [fetchCars]);
 
   return (
     <Fragment>
@@ -72,15 +84,17 @@ function CarManagement() {
         >
           <div className="flex items-center w-full gap-3 mb-6">
             <SearchBar
-              searchText={searchText}
+              searchText={filter.name}
               styleClass="w-1/3"
-              setSearchText={setSearchText}
+              setSearchText={(name) => setFilter({ name })}
             />
-            <button className="w-32 btn btn-primary btn-sm">Search</button>
             <button
-              className="w-32 btn btn-outline btn-sm"
+              className="w-32 btn btn-primary btn-sm"
               onClick={() => setPagination({ page: 0, size: 10 })}
             >
+              Search
+            </button>
+            <button className="w-32 btn btn-outline btn-sm" onClick={onReset}>
               Reset
             </button>
           </div>
@@ -105,7 +119,10 @@ function CarManagement() {
                         <td className="text-base">{car.registrationPlate}</td>
                         <td>{renderStatus(car)}</td>
                         <td>
-                          <button className="btn btn-square btn-outline btn-sm btn-primary">
+                          <button
+                            className="btn btn-square btn-outline btn-sm btn-primary"
+                            onClick={() => setSelectedCar(car)}
+                          >
                             <Pencil width={20} height={20} />
                           </button>
                         </td>
@@ -121,6 +138,21 @@ function CarManagement() {
                 )}
               </tbody>
             </table>
+
+            <div
+              className={`flex items-center justify-end w-full mt-4 ${
+                cars.total === 0 ? "hidden" : "flex"
+              }`}
+            >
+              <Pagination
+                total={cars.total}
+                page={pagination.page}
+                size={pagination.size}
+                onPageChange={(page) =>
+                  setPagination((prev) => ({ ...prev, page }))
+                }
+              />
+            </div>
           </div>
         </TitleCard>
       </div>
@@ -128,6 +160,12 @@ function CarManagement() {
       <AddModal
         open={isOpenAddModal}
         onClose={() => setOpenAddModal(false)}
+        refresh={() => setPagination({ page: 0, size: 10 })}
+        size="lg"
+      />
+      <EditModal
+        car={selectedCar}
+        onClose={() => setSelectedCar(null)}
         refresh={() => setPagination({ page: 0, size: 10 })}
         size="lg"
       />
