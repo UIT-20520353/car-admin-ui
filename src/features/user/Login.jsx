@@ -1,41 +1,57 @@
-import { useState } from "react";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import appConstant from "../../app/constant";
-import InputText from "../../components/Input/InputText";
+import * as yup from "yup";
+import { EToastType, showToast } from "../../app/toast";
 import ErrorText from "../../components/Typography/ErrorText";
+import {
+  login,
+  resetLoginResult,
+  selectAuthState,
+} from "../../redux/authSlice";
+
+const validationSchema = yup.object({
+  username: yup.string().required("Vui lòng nhập tên đăng nhập!"),
+  password: yup.string().required("Vui lòng nhập mật khẩu!"),
+});
 
 function Login() {
   const navigate = useNavigate();
-  const INITIAL_LOGIN_OBJ = {
-    password: "",
-    emailId: "",
-  };
+  const dispatch = useDispatch();
+  const { loginResult } = useSelector(selectAuthState);
 
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [loginObj, setLoginObj] = useState(INITIAL_LOGIN_OBJ);
 
-  const submitForm = (e) => {
-    e.preventDefault();
-    setErrorMessage("");
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm({
+    mode: "onChange",
+    resolver: yupResolver(validationSchema),
+  });
 
-    if (loginObj.emailId.trim() === "")
-      return setErrorMessage("Email Id is required! (use any value)");
-    if (loginObj.password.trim() === "")
-      return setErrorMessage("Password is required! (use any value)");
-    else {
-      setLoading(true);
-      // Call API to check user credentials and save token in localstorage
-      localStorage.setItem(appConstant.TOKEN_KEY, "DumyTokenHere");
-      setLoading(false);
-      navigate("/");
+  const submitForm = (data) => {
+    setLoading(true);
+    dispatch(login(data));
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (loginResult) {
+      if (loginResult === "success") {
+        showToast("Đăng nhập thành công!", EToastType.SUCCESS);
+        navigate("/");
+      } else {
+        showToast("Sai tên đăng nhập hoặc mật khẩu!", EToastType.ERROR);
+      }
+
+      dispatch(resetLoginResult());
     }
-  };
-
-  const updateFormValue = ({ updateType, value }) => {
-    setErrorMessage("");
-    setLoginObj({ ...loginObj, [updateType]: value });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loginResult]);
 
   return (
     <div className="flex items-center min-h-screen bg-base-200">
@@ -45,34 +61,46 @@ function Login() {
             <h2 className="mb-2 text-2xl font-semibold text-center">
               Đăng nhập
             </h2>
-            <form onSubmit={(e) => submitForm(e)}>
+            <form onSubmit={handleSubmit(submitForm)}>
               <div className="mb-4">
-                <InputText
-                  type="emailId"
-                  defaultValue={loginObj.emailId}
-                  updateType="emailId"
-                  containerStyle="mt-4"
-                  labelTitle="Email"
-                  updateFormValue={updateFormValue}
-                  placeholder="Nhập email"
-                />
+                <div className="w-full mt-4 form-control">
+                  <label className="label">
+                    <span className="label-text text-base-content">
+                      Tên đăng nhập
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Nhập email"
+                    className="w-full input input-bordered"
+                    autoComplete="off"
+                    {...register("username")}
+                  />
+                </div>
 
-                <InputText
-                  defaultValue={loginObj.password}
-                  type="password"
-                  updateType="password"
-                  containerStyle="mt-4"
-                  labelTitle="Mật khẩu"
-                  updateFormValue={updateFormValue}
-                  placeholder="Nhập mật khẩu"
-                />
+                <div className="w-full mt-4 form-control">
+                  <label className="label">
+                    <span className="label-text text-base-content">
+                      Mật khẩu
+                    </span>
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="Nhập mật khẩu"
+                    className="w-full input input-bordered"
+                    autoComplete="off"
+                    {...register("password")}
+                  />
+                </div>
               </div>
 
-              <ErrorText styleClass="mt-8">{errorMessage}</ErrorText>
+              <ErrorText styleClass="my-4">
+                {errors?.username?.message || errors?.password?.message}
+              </ErrorText>
               <button
                 type="submit"
                 className={
-                  "btn mt-2 w-full btn-primary xl:text-lg" +
+                  "btn w-full btn-primary xl:text-lg" +
                   (loading ? " loading" : "")
                 }
               >

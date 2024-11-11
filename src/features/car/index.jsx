@@ -1,8 +1,9 @@
 import Pencil from "@heroicons/react/24/outline/PencilIcon";
 import React, { Fragment, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
 import SearchBar from "../../components/Input/SearchBar";
+import { getCars, selectCarState } from "../../redux/carSlice";
 import { setPageTitle } from "../common/headerSlice";
 import AddModal from "./components/AddModal";
 
@@ -21,15 +22,45 @@ const TopSideButtons = ({ onOpenAddModal }) => {
 
 function CarManagement() {
   const dispatch = useDispatch();
+  const { cars } = useSelector(selectCarState);
   const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [pagination, setPagination] = useState({ page: 0, size: 10 });
 
   const onOpenAddModal = () => setOpenAddModal(true);
+
+  const renderStatus = (car) => {
+    switch (car.status) {
+      case "FREE":
+        return (
+          <div className="flex items-center justify-center p-3 text-base text-white badge badge-success">
+            Free
+          </div>
+        );
+      case "ON_RENT":
+        return (
+          <div className="flex items-center justify-center p-3 text-base text-white badge badge-success">
+            On rent
+          </div>
+        );
+      default:
+        return (
+          <div className="flex items-center justify-center p-3 text-base text-white badge badge-info">
+            None
+          </div>
+        );
+    }
+  };
 
   useEffect(() => {
     dispatch(setPageTitle({ title: "Car Management" }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    dispatch(getCars(pagination));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination]);
 
   return (
     <Fragment>
@@ -46,37 +77,48 @@ function CarManagement() {
               setSearchText={setSearchText}
             />
             <button className="w-32 btn btn-primary btn-sm">Search</button>
-            <button className="w-32 btn btn-outline btn-sm">Reset</button>
+            <button
+              className="w-32 btn btn-outline btn-sm"
+              onClick={() => setPagination({ page: 0, size: 10 })}
+            >
+              Reset
+            </button>
           </div>
           <div className="w-full overflow-x-auto scroll-custom">
             <table className="table w-full">
               <thead>
                 <tr>
                   <th>Car ID</th>
-                  <th>Start date</th>
-                  <th>End date</th>
-                  <th>Customer Name</th>
-                  <th>Contract status</th>
+                  <th>Name</th>
+                  <th>Registration plate</th>
                   <th>Status</th>
-                  <th>Note</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>#123</td>
-                  <td>13/10/2024</td>
-                  <td>23/10/2024</td>
-                  <td>Duc</td>
-                  <td>Expired</td>
-                  <td>On rent</td>
-                  <td>2131512341234</td>
-                  <td>
-                    <button className="btn btn-square btn-outline btn-sm btn-primary">
-                      <Pencil width={20} height={20} />
-                    </button>
-                  </td>
-                </tr>
+                {cars.total ? (
+                  <Fragment>
+                    {cars.list.map((car) => (
+                      <tr key={`car-${car.id}`}>
+                        <td className="text-base">{car.id}</td>
+                        <td className="text-base">{car.name}</td>
+                        <td className="text-base">{car.registrationPlate}</td>
+                        <td>{renderStatus(car)}</td>
+                        <td>
+                          <button className="btn btn-square btn-outline btn-sm btn-primary">
+                            <Pencil width={20} height={20} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </Fragment>
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="text-center">
+                      Data not found
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -86,6 +128,7 @@ function CarManagement() {
       <AddModal
         open={isOpenAddModal}
         onClose={() => setOpenAddModal(false)}
+        refresh={() => setPagination({ page: 0, size: 10 })}
         size="lg"
       />
     </Fragment>

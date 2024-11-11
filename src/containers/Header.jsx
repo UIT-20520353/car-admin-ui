@@ -1,15 +1,16 @@
 import Bars3Icon from "@heroicons/react/24/outline/Bars3Icon";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import appConstant from "../app/constant";
+import { logout } from "../redux/authSlice";
 
 function Header() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { pageTitle } = useSelector((state) => state.header);
 
   const logoutUser = () => {
-    localStorage.removeItem(appConstant.TOKEN_KEY);
+    dispatch(logout());
     navigate("/login");
   };
 

@@ -1,11 +1,27 @@
-import { NotificationContainer } from "react-notifications";
-import "react-notifications/lib/notifications.css";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import appConstant from "../app/constant";
+import { getProfile } from "../redux/authSlice";
 import LeftSidebar from "./LeftSidebar";
 import ModalLayout from "./ModalLayout";
 import PageContent from "./PageContent";
 import RightSidebar from "./RightSidebar";
 
 function Layout() {
+  const accessToken = localStorage.getItem(appConstant.TOKEN_KEY);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!accessToken) {
+      navigate("/login");
+    } else {
+      dispatch(getProfile());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessToken]);
+
   return (
     <>
       {/* Left drawer - containing page content and side bar (always open) */}
@@ -21,9 +37,6 @@ function Layout() {
 
       {/* Right drawer - containing secondary content like notifications list etc.. */}
       <RightSidebar />
-
-      {/** Notification layout container */}
-      <NotificationContainer />
 
       {/* Modal layout container */}
       <ModalLayout />

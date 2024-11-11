@@ -1,6 +1,8 @@
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import App from "./App";
 import store from "./app/store";
 import SuspenseContent from "./containers/SuspenseContent";
@@ -13,6 +15,7 @@ root.render(
   <Suspense fallback={<SuspenseContent />}>
     <Provider store={store}>
       <App />
+      <ToastContainer />
     </Provider>
   </Suspense>
   // </React.StrictMode>
