@@ -8,6 +8,7 @@ import { setPageTitle } from "../common/headerSlice";
 import AddModal from "./components/AddModal";
 import EditModal from "./components/EditModal";
 import Pagination from "../../components/pagination";
+import { selectAuthState } from "../../redux/authSlice";
 
 const TopSideButtons = ({ onOpenAddModal }) => {
   return (
@@ -25,10 +26,11 @@ const TopSideButtons = ({ onOpenAddModal }) => {
 function CarManagement() {
   const dispatch = useDispatch();
   const { cars } = useSelector(selectCarState);
+  const { profile } = useSelector(selectAuthState);
   const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
   const [selectedCar, setSelectedCar] = useState(null);
-  const [filter, setFilter] = useState({ name: "" });
+  const [filter, setFilter] = useState({ name: "", status: "" });
 
   const onOpenAddModal = () => setOpenAddModal(true);
 
@@ -86,8 +88,19 @@ function CarManagement() {
             <SearchBar
               searchText={filter.name}
               styleClass="w-1/3"
-              setSearchText={(name) => setFilter({ name })}
+              setSearchText={(name) => setFilter((prev) => ({ ...prev, name }))}
             />
+            <select
+              className="w-1/3 select select-bordered select-sm"
+              value={filter.status}
+              onChange={(e) =>
+                setFilter((prev) => ({ ...prev, status: e.target.value }))
+              }
+            >
+              <option value="">All</option>
+              <option value="FREE">Free</option>
+              <option value="ON_RENT">On rent</option>
+            </select>
             <button
               className="w-32 btn btn-primary btn-sm"
               onClick={() => setPagination({ page: 0, size: 10 })}
@@ -120,7 +133,9 @@ function CarManagement() {
                         <td>{renderStatus(car)}</td>
                         <td>
                           <button
-                            className="btn btn-square btn-outline btn-sm btn-primary"
+                            className={`btn btn-square btn-outline btn-sm btn-primary ${
+                              profile?.role !== "ADMIN" && "hidden"
+                            }`}
                             onClick={() => setSelectedCar(car)}
                           >
                             <Pencil width={20} height={20} />

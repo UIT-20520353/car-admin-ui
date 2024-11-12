@@ -12,8 +12,8 @@ import {
 } from "../../../redux/carSlice";
 
 const validationSchema = yup.object({
-  name: yup.string().required("Vui lòng nhập tên xe!"),
-  registrationPlate: yup.string().required("Vui lòng nhập biển số xe!"),
+  name: yup.string().required("Please enter car name!"),
+  registrationPlate: yup.string().required("Please enter registration plate!"),
 });
 
 const EditModal = ({ size, onClose, refresh, car }) => {
@@ -60,7 +60,7 @@ const EditModal = ({ size, onClose, refresh, car }) => {
         reset();
         onClose();
         refresh();
-        showToast("Sửa thông tin xe thành công!", EToastType.SUCCESS);
+        showToast("Edit car information successfully!", EToastType.SUCCESS);
       } else {
         showToast(editCarResult, EToastType.ERROR);
       }
@@ -89,7 +89,7 @@ const EditModal = ({ size, onClose, refresh, car }) => {
           ✕
         </button>
         <h3 className="pb-4 text-2xl font-semibold text-center">
-          Add Car Contract
+          Edit car information
         </h3>
 
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">

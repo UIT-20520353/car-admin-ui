@@ -1,18 +1,18 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { selectCarState } from "../../../redux/carSlice";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
-import * as yup from "yup";
-import ErrorText from "../../../components/Typography/ErrorText";
-import {
-  addContract,
-  resetAddContractResult,
-  selectConstractState,
-} from "../../../redux/contractSlice";
-import { EToastType, showToast } from "../../../app/toast";
 import * as dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import React, { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import * as yup from "yup";
+import { EToastType, showToast } from "../../../app/toast";
+import ErrorText from "../../../components/Typography/ErrorText";
+import { selectCarState } from "../../../redux/carSlice";
+import {
+  editContract,
+  resetEditContractResult,
+  selectConstractState,
+} from "../../../redux/contractSlice";
 
 dayjs.extend(isSameOrAfter);
 
@@ -60,10 +60,10 @@ const validationSchema = yup.object({
     .min(1, "Duration must be greater than 1"),
 });
 
-const AddModal = ({ open, size, onClose, refresh }) => {
+const EditModal = ({ selectedContract, size, onClose, refresh }) => {
   const dispatch = useDispatch();
   const { cars } = useSelector(selectCarState);
-  const { addContractResult } = useSelector(selectConstractState);
+  const { editContractResult } = useSelector(selectConstractState);
   const [selectCar, setSelectCar] = useState(null);
   const [step, setStep] = useState(1);
   const [carName, setCarname] = useState("");
@@ -113,7 +113,7 @@ const AddModal = ({ open, size, onClose, refresh }) => {
   }, [cars, carName]);
 
   const onSubmit = (data) => {
-    dispatch(addContract({ data, car: selectCar }));
+    dispatch(editContract({ data, car: selectCar, id: selectedContract.id }));
   };
 
   const errorText =
@@ -126,29 +126,44 @@ const AddModal = ({ open, size, onClose, refresh }) => {
     "";
 
   useEffect(() => {
-    if (addContractResult) {
-      if (addContractResult === "success") {
+    if (editContractResult) {
+      if (editContractResult === "success") {
         reset();
         onClose();
         refresh();
-        showToast("Thêm xe thành công!", EToastType.SUCCESS);
+        showToast("Edit contract su", EToastType.SUCCESS);
       } else {
-        showToast(addContractResult, EToastType.ERROR);
+        showToast(editContractResult, EToastType.ERROR);
       }
-      dispatch(resetAddContractResult());
+      dispatch(resetEditContractResult());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addContractResult]);
+  }, [editContractResult]);
 
   useEffect(() => {
-    if (!open) {
+    if (!selectedContract) {
       reset();
+    } else {
+      setStep(2);
+      setSelectCar(selectedContract.car);
+      reset({
+        customerEmail: selectedContract.customerEmail,
+        customerName: selectedContract.customerName,
+        customerPhone: selectedContract.customerPhone,
+        note: selectedContract.note,
+        date: dayjs(selectedContract.date).format("YYYY-MM-DD"),
+        startDate: dayjs(selectedContract.startDate).format("YYYY-MM-DD"),
+        duration: dayjs(selectedContract.endDate).diff(
+          dayjs(selectedContract.startDate),
+          "day"
+        ),
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [selectedContract]);
 
   return (
-    <div className={`modal ${open ? "modal-open" : ""}`}>
+    <div className={`modal ${!!selectedContract ? "modal-open" : ""}`}>
       <div
         className={`modal-box scroll-custom  ${
           size === "lg" ? "max-w-2xl" : ""
@@ -161,7 +176,7 @@ const AddModal = ({ open, size, onClose, refresh }) => {
           ✕
         </button>
         <h3 className="pb-4 text-2xl font-semibold text-center">
-          Add car contract
+          Edit contract
         </h3>
 
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">
@@ -343,4 +358,4 @@ const AddModal = ({ open, size, onClose, refresh }) => {
   );
 };
 
-export default AddModal;
+export default EditModal;

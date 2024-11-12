@@ -14,6 +14,7 @@ export const getCars = createAsyncThunk(
         page: pagination.page,
         size: pagination.size,
         "name.contains": filter.name || null,
+        "status.equals": filter.status || null,
       },
     });
 

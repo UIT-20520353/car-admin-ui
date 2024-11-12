@@ -4,6 +4,7 @@ import modalSlice from "../features/common/modalSlice";
 import rightDrawerSlice from "../features/common/rightDrawerSlice";
 import leadsSlice from "../features/leads/leadSlice";
 import authSlice from "../redux/authSlice";
+import contractSlice from "../redux/contractSlice";
 import carSlice from "../redux/carSlice";
 
 const combinedReducer = {
@@ -13,6 +14,7 @@ const combinedReducer = {
   lead: leadsSlice,
   auth: authSlice,
   car: carSlice,
+  contract: contractSlice,
 };
 
 export default configureStore({

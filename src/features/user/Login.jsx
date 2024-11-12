@@ -13,8 +13,8 @@ import {
 } from "../../redux/authSlice";
 
 const validationSchema = yup.object({
-  username: yup.string().required("Vui lòng nhập tên đăng nhập!"),
-  password: yup.string().required("Vui lòng nhập mật khẩu!"),
+  username: yup.string().required("Please enter your username!"),
+  password: yup.string().required("Please enter your password!"),
 });
 
 function Login() {
