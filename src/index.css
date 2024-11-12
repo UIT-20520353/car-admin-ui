@@ -56,3 +56,13 @@
   background-color: #000000;
   border-radius: 10px;
 }
+
+.btn-danger {
+  color: rgb(249, 99, 99);
+  border-color: rgb(249, 99, 99);
+}
+.btn-danger:hover {
+  background-color: rgb(249, 99, 99);
+  border-color: rgb(249, 99, 99);
+  color: white;
+}

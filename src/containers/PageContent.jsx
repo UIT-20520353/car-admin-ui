@@ -7,11 +7,15 @@ import SuspenseContent from "./SuspenseContent";
 import ContractPage from "../features/contract";
 import CarManagement from "../features/car";
 import IncomeOutcomePage from "../features/income";
+import ItemPage from "../features/item";
+import StaffPage from "../features/staff";
+import { selectAuthState } from "../redux/authSlice";
 // import routes from "../routes";
 
 function PageContent() {
   const mainContentRef = useRef(null);
   const { pageTitle } = useSelector((state) => state.header);
+  const { profile } = useSelector(selectAuthState);
 
   // Scroll back to top on new page load
   useEffect(() => {
@@ -33,6 +37,11 @@ function PageContent() {
             <Route path="/cars" element={<CarManagement />} />
             <Route path="/contracts" element={<ContractPage />} />
             <Route path="/income-outcome" element={<IncomeOutcomePage />} />
+            <Route path="/item" element={<ItemPage />} />
+            {profile?.role === "ADMIN" && (
+              <Route path="/staff" element={<StaffPage />} />
+            )}
+
             <Route index element={<RentManagement />} />
             {/* {routes.map((route, key) => {
               return (

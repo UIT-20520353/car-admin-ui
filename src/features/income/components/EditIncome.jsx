@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import ErrorText from "../../../components/Typography/ErrorText";
@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import useHandleResponse from "../../../hooks/useHandleResponse";
 import { addInout } from "../../../redux/inoutSlice";
 import { getItems, selectItems } from "../../../redux/itemSlice";
+import { selectAuthState } from "../../../redux/authSlice";
+import { hoursBetween } from "../../../utils/date";
 
 const validationSchema = yup.object({
   amount: yup
@@ -18,21 +20,23 @@ const validationSchema = yup.object({
   type: yup.string(),
 });
 
-const AddIncome = ({ open, size, onClose }) => {
+const EditIncome = ({ size, onClose, refresh, inout }) => {
   const dispatch = useDispatch();
   const handleResponse = useHandleResponse();
+  const { profile } = useSelector(selectAuthState);
   const { items } = useSelector(selectItems);
 
   useEffect(() => {
-    if (open) {
+    if (!!inout) {
       dispatch(getItems({ pagination: { page: 0, size: 99999 } }));
     }
-  }, [open]);
+  }, [inout]);
 
   const {
     handleSubmit,
     register,
     reset,
+    setValue,
     formState: { errors },
   } = useForm({
     mode: "onChange",
@@ -47,7 +51,6 @@ const AddIncome = ({ open, size, onClose }) => {
 
   const handleClose = () => {
     onClose();
-    reset();
   };
 
   const onCancelClick = () => {
@@ -56,12 +59,49 @@ const AddIncome = ({ open, size, onClose }) => {
 
   const onSubmit = (data) => {
     dispatch(addInout(data)).then((response) =>
-      handleResponse(response, `Add new ${data.type} successfully`, handleClose)
+      handleResponse(response, `Edit successfully`, handleClose)
     );
   };
 
+  const inoutItem = useMemo(
+    () => inout && items.total && items.list.find((i) => i.name === inout.item),
+    [inout, items.total]
+  );
+
+  useEffect(() => {
+    if (inout && !!items.total) {
+      setValue("amount", inout.amount);
+      setValue("note", inout.note);
+      setValue("itemId", inoutItem.id);
+      setValue("type", inout.type);
+    } else {
+      reset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inout, items.total]);
+
+  const onResetClick = () => {
+    setValue("amount", inout.amount);
+    setValue("note", inout.note);
+    setValue("itemId", inoutItem.id);
+    setValue("type", inout.type);
+  };
+
+  const enableEdit = useMemo(() => {
+    if (inout && profile) {
+      if (profile.role === "ADMIN") {
+        return true;
+      }
+      return (
+        profile.username === inout.createdUser.username &&
+        hoursBetween(new Date(inout.createdDate), new Date()) < 24
+      );
+    }
+    return true;
+  }, [inout, profile]);
+
   return (
-    <div className={`modal ${open ? "modal-open" : ""}`}>
+    <div className={`modal ${!!inout ? "modal-open" : ""}`}>
       <div className={`modal-box  ${size === "lg" ? "max-w-xl" : ""}`}>
         <button
           className="absolute btn btn-sm btn-circle right-2 top-2"
@@ -79,6 +119,7 @@ const AddIncome = ({ open, size, onClose }) => {
                 <select
                   className="w-full select select-bordered"
                   {...register("type")}
+                  disabled={!enableEdit}
                 >
                   <option value={null}></option>
                   <option value="INCOME">INCOME</option>
@@ -91,6 +132,7 @@ const AddIncome = ({ open, size, onClose }) => {
                   <select
                     className="w-full select select-bordered"
                     {...register("itemId")}
+                    disabled={!enableEdit}
                   >
                     <option value={null}></option>
                     {items.list.map((item) => (
@@ -109,6 +151,7 @@ const AddIncome = ({ open, size, onClose }) => {
                   className="w-full input input-bordered"
                   placeholder="Enter Amount"
                   {...register("amount")}
+                  disabled={!enableEdit}
                 />
               </div>
               <div className="flex flex-col items-start w-full gap-1">
@@ -118,6 +161,7 @@ const AddIncome = ({ open, size, onClose }) => {
                   className="w-full resize-none textarea textarea-bordered"
                   rows={5}
                   {...register("note")}
+                  disabled={!enableEdit}
                 />
               </div>
             </div>
@@ -126,18 +170,20 @@ const AddIncome = ({ open, size, onClose }) => {
                 errors?.type?.message ||
                 errors?.itemId?.message}
             </ErrorText>
-            <div className="flex items-center justify-center w-full gap-4 mt-5">
-              <button
-                className="w-32 btn btn-outline btn-sm"
-                type="button"
-                onClick={() => reset()}
-              >
-                Reset
-              </button>
-              <button className="w-32 btn btn-primary btn-sm" type="submit">
-                Save
-              </button>
-            </div>
+            {enableEdit && (
+              <div className="flex items-center justify-center w-full gap-4 mt-5">
+                <button
+                  className="w-32 btn btn-outline btn-sm"
+                  type="button"
+                  onClick={() => onResetClick()}
+                >
+                  Reset
+                </button>
+                <button className="w-32 btn btn-primary btn-sm" type="submit">
+                  Save
+                </button>
+              </div>
+            )}
           </form>
         </div>
       </div>
@@ -145,4 +191,4 @@ const AddIncome = ({ open, size, onClose }) => {
   );
 };
 
-export default AddIncome;
+export default EditIncome;
