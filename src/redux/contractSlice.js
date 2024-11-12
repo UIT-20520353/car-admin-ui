@@ -14,6 +14,7 @@ export const getContracts = createAsyncThunk(
         page: pagination.page,
         size: pagination.size,
         "carId.equals": filter.carId || null,
+        "status.in": filter.status || null,
       },
     });
 

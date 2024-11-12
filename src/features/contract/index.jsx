@@ -56,11 +56,11 @@ function ContractPage() {
       return false;
     }
 
-    if (profile.role === "ADMIN") {
+    if (profile?.role === "ADMIN") {
       return true;
     }
 
-    return profile.id === contract.createUser.id && !isLessThan24Hours;
+    return profile?.id === contract.createUser.id && isLessThan24Hours;
   };
 
   const onReset = () => {
@@ -152,7 +152,7 @@ function ContractPage() {
                   </Fragment>
                 ) : (
                   <tr>
-                    <td colSpan={4} className="text-center">
+                    <td colSpan={6} className="text-center">
                       Data not found
                     </td>
                   </tr>

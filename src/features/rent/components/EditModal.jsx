@@ -8,33 +8,18 @@ import * as yup from "yup";
 import { EToastType, showToast } from "../../../app/toast";
 import ErrorText from "../../../components/Typography/ErrorText";
 import { selectCarState } from "../../../redux/carSlice";
+import { selectConstractState } from "../../../redux/contractSlice";
 import {
-  editContract,
-  resetEditContractResult,
-  selectConstractState,
-} from "../../../redux/contractSlice";
+  editRental,
+  resetEditRentalResult,
+  selectRentalState,
+} from "../../../redux/rentalSlice";
 
 dayjs.extend(isSameOrAfter);
 
 const minDate = dayjs().startOf("day");
 
 const validationSchema = yup.object({
-  customerEmail: yup
-    .string()
-    .required("Please enter your email!")
-    .matches(
-      /^[a-zA-Z0-9_\\.-]+@[a-zA-Z0-9.]+\.[a-zA-Z]{2,4}?$/,
-      "Email is not in the correct format!"
-    ),
-  customerName: yup.string().required("Please enter customer name!"),
-  customerPhone: yup
-    .string()
-    .required("Please enter customer phone!")
-    .matches(
-      /^\+?[1-9]\d{1,14}$/,
-      "Phone number is not in the correct format!"
-    ),
-  note: yup.string(),
   date: yup
     .date()
     .required("Date is required")
@@ -49,25 +34,41 @@ const validationSchema = yup.object({
   startDate: yup
     .date()
     .required("Start date is required")
-    .typeError("Invalid date format")
-    .test("min-start-date", "Start date cannot be in the past", (value) => {
-      return value && dayjs(value).isSameOrAfter(minDate, "day");
-    }),
+    .typeError("Invalid date format"),
+  lateDays: yup
+    .number()
+    .required("Late days is required")
+    .typeError("Late days must be a number")
+    .min(0, "Late days must be greater than or equal 0"),
   duration: yup
     .number()
     .required("Duration is required")
     .typeError("Duration must be a number")
-    .min(0, "Duration must be greater than 0"),
+    .integer("Must be an integer")
+    .min(1, "Duration must be greater than or equal 1"),
+  amount: yup
+    .number()
+    .required("Duration is required")
+    .typeError("Duration must be a number")
+    .test("min-amount", "Amount must be greater than 0", (value) => {
+      return value && Number(value) > 0;
+    }),
+  payment: yup.string().required("Payment method is required"),
+  feeType: yup.string().required("Fee type is required"),
+  note: yup.string(),
+  contractId: yup.string().required("Contract is required"),
 });
 
-const EditModal = ({ selectedContract, size, onClose, refresh }) => {
-  const dispatch = useDispatch();
+const EditModal = ({ rental, size, onClose, refresh }) => {
   const { cars } = useSelector(selectCarState);
-  const { editContractResult } = useSelector(selectConstractState);
+  const { contracts } = useSelector(selectConstractState);
+  const { editRentalResult } = useSelector(selectRentalState);
+
   const [selectCar, setSelectCar] = useState(null);
   const [step, setStep] = useState(1);
   const [carName, setCarname] = useState("");
 
+  const dispatch = useDispatch();
   const {
     handleSubmit,
     register,
@@ -77,15 +78,31 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
     mode: "onChange",
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      customerEmail: "",
-      customerName: "",
-      customerPhone: "",
       note: "",
       date: dayjs().format("YYYY-MM-DD"),
       startDate: dayjs().format("YYYY-MM-DD"),
       duration: 1,
+      lateDays: 0,
+      amount: 0,
+      feeType: "RENTAL_FEE",
+      payment: "CASH",
     },
   });
+
+  const filteredCars = useMemo(() => {
+    const name = carName.toLowerCase();
+    return cars.list.filter((car) => car.name.toLowerCase().includes(name));
+  }, [cars, carName]);
+
+  const filteredContracts = useMemo(() => {
+    if (selectCar) {
+      return contracts.list.filter(
+        (contract) => contract.car.id === selectCar.id
+      );
+    }
+
+    return [];
+  }, [selectCar, contracts]);
 
   const handleClose = () => {
     onClose();
@@ -104,73 +121,69 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
   const onNextClick = () => {
     if (step === 1 && selectCar) {
       setStep(2);
+      return;
+    }
+
+    if (step === 2) {
+      // Save data
+      handleClose();
     }
   };
 
-  const filteredCars = useMemo(() => {
-    const name = carName.toLowerCase();
-    return cars.list.filter((car) => car.name.toLowerCase().includes(name));
-  }, [cars, carName]);
-
   const onSubmit = (data) => {
-    dispatch(editContract({ data, car: selectCar, id: selectedContract.id }));
+    dispatch(editRental({ data, id: rental.id }));
   };
 
   const errorText =
     errors?.date?.message ||
-    errors?.customerEmail?.message ||
-    errors?.customerName?.message ||
-    errors?.customerPhone?.message ||
     errors?.startDate?.message ||
+    errors?.lateDays?.message ||
     errors?.duration?.message ||
+    errors?.amount?.message ||
+    errors?.payment?.message ||
+    errors?.feeType?.message ||
+    errors?.contractId?.message ||
     "";
 
   useEffect(() => {
-    if (editContractResult) {
-      if (editContractResult === "success") {
+    if (editRentalResult) {
+      if (editRentalResult === "success") {
         reset();
         onClose();
         refresh();
-        showToast("Edit contract successfully!", EToastType.SUCCESS);
+        showToast("Edit payment receipt successfully!", EToastType.SUCCESS);
       } else {
-        showToast(editContractResult, EToastType.ERROR);
+        showToast(editRentalResult, EToastType.ERROR);
       }
-      dispatch(resetEditContractResult());
+      dispatch(resetEditRentalResult());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editContractResult]);
+  }, [editRentalResult]);
 
   useEffect(() => {
-    if (!selectedContract) {
+    if (!rental) {
       reset();
     } else {
       setStep(2);
-      setSelectCar(selectedContract.car);
+      setSelectCar(rental.contract.car);
       reset({
-        customerEmail: selectedContract.customerEmail,
-        customerName: selectedContract.customerName,
-        customerPhone: selectedContract.customerPhone,
-        note: selectedContract.note,
-        date: dayjs(selectedContract.date).format("YYYY-MM-DD"),
-        startDate: dayjs(selectedContract.startDate).format("YYYY-MM-DD"),
-        duration:
-          selectedContract.duration ||
-          dayjs(selectedContract.endDate).diff(
-            dayjs(selectedContract.startDate),
-            "day"
-          ),
+        date: dayjs(rental.date).format("YYYY-MM-DD"),
+        startDate: dayjs(rental.startDate).format("YYYY-MM-DD"),
+        lateDays: rental.lateDays,
+        duration: rental.duration,
+        amount: rental.amount,
+        payment: rental.payment,
+        feeType: rental.feeType,
+        note: rental.note,
+        contractId: rental.contract.id,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedContract]);
+  }, [rental]);
 
   return (
-    <div className={`modal ${!!selectedContract ? "modal-open" : ""}`}>
-      <div
-        className={`modal-box scroll-custom  ${
-          size === "lg" ? "max-w-2xl" : ""
-        }`}
-      >
+    <div className={`modal ${!!rental ? "modal-open" : ""}`}>
+      <div className={`modal-box  ${size === "lg" ? "max-w-2xl" : ""}`}>
         <button
           className="absolute btn btn-sm btn-circle right-2 top-2"
           onClick={handleClose}
@@ -178,7 +191,7 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
           ✕
         </button>
         <h3 className="pb-4 text-2xl font-semibold text-center">
-          Edit contract
+          Edit Payment Receipt
         </h3>
 
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">
@@ -207,38 +220,71 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
               </div>
 
               <div className="flex flex-col items-start w-full gap-1">
-                <label className="ml-3 text-base font-medium">Email</label>
+                <label className="ml-3 text-base font-medium">Late days</label>
                 <input
                   type="text"
                   className="w-full input input-bordered"
-                  placeholder="Enter email"
-                  {...register("customerEmail")}
+                  placeholder="Enter late days"
+                  {...register("lateDays")}
                 />
               </div>
             </div>
 
             <div className="grid w-full grid-cols-2 gap-3">
               <div className="flex flex-col items-start w-full gap-1">
-                <label className="ml-3 text-base font-medium">
-                  Customer name
-                </label>
-                <input
-                  type="text"
-                  className="w-full input input-bordered"
-                  placeholder="Enter customer name"
-                  {...register("customerName")}
-                />
+                <label className="ml-3 text-base font-medium">Contract</label>
+                <select
+                  className="w-full select select-bordered"
+                  {...register("contractId")}
+                >
+                  {filteredContracts.map((contract) => (
+                    <option
+                      key={`contract-option-${contract.id}`}
+                      value={contract.id}
+                    >
+                      <p className="break-all whitespace-pre">{`${
+                        contract.customerName
+                      } - ${dayjs(contract.startDate).format(
+                        "DD/MM/YYYY"
+                      )} - ${dayjs(contract.endDate).format("DD/MM/YYYY")}`}</p>
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="flex flex-col items-start w-full gap-1">
-                <label className="ml-3 text-base font-medium">
-                  Customer phone
-                </label>
+                <label className="ml-3 text-base font-medium">Payment</label>
+                <select
+                  className="w-full select select-bordered"
+                  {...register("payment")}
+                >
+                  <option value="CASH">Cash</option>
+                  <option value="BANK">Bank</option>
+                  <option value="SQUARE">Square</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid w-full grid-cols-2 gap-3">
+              <div className="flex flex-col items-start w-full gap-1">
+                <label className="ml-3 text-base font-medium">Fee Type</label>
+                <select
+                  className="w-full select select-bordered"
+                  {...register("feeType")}
+                >
+                  <option value="RENTAL_FEE">Rental Fee</option>
+                  <option value="LATE_FEE">Late Fee</option>
+                  <option value="ACCIDENT_FEE">Accident Fee</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col items-start w-full gap-1">
+                <label className="ml-3 text-base font-medium">Amount</label>
                 <input
                   type="text"
                   className="w-full input input-bordered"
-                  placeholder="Enter customer phone"
-                  {...register("customerPhone")}
+                  placeholder="Enter amount"
+                  {...register("amount")}
                 />
               </div>
             </div>
@@ -257,10 +303,9 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
               <div className="flex flex-col items-start w-full gap-1">
                 <label className="ml-3 text-base font-medium">Duration</label>
                 <input
-                  type="number"
+                  type="text"
                   className="w-full input input-bordered"
                   placeholder="Enter duration"
-                  min={0}
                   {...register("duration")}
                 />
               </div>

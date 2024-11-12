@@ -44,7 +44,7 @@ function CarManagement() {
         );
       case "ON_RENT":
         return (
-          <div className="flex items-center justify-center p-3 text-base text-white badge badge-success">
+          <div className="flex items-center justify-center p-3 text-base text-white badge badge-error">
             On rent
           </div>
         );
