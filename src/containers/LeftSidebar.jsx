@@ -2,9 +2,13 @@ import XMarkIcon from "@heroicons/react/24/outline/XMarkIcon";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import routes from "../routes/sidebar";
 import SidebarSubmenu from "./SidebarSubmenu";
+import { selectAuthState } from "../redux/authSlice";
+import { UserIcon } from "@heroicons/react/24/outline";
+import { useSelector } from "react-redux";
 
 function LeftSidebar() {
   const location = useLocation();
+  const { profile } = useSelector(selectAuthState);
 
   const close = (e) => {
     document.getElementById("left-sidebar-drawer").click();
@@ -58,6 +62,25 @@ function LeftSidebar() {
             </li>
           );
         })}
+        {profile?.role === "ADMIN" && (
+          <li className="">
+            <NavLink
+              end
+              to="/staff"
+              className={({ isActive }) =>
+                `${isActive ? "font-semibold  bg-base-200 " : "font-normal"}`
+              }
+            >
+              <UserIcon className="h-6 w-6" /> Staff
+              {location.pathname === "/staff" ? (
+                <span
+                  className="absolute inset-y-0 left-0 w-1 rounded-tr-md rounded-br-md bg-primary "
+                  aria-hidden="true"
+                ></span>
+              ) : null}
+            </NavLink>
+          </li>
+        )}
       </ul>
     </div>
   );

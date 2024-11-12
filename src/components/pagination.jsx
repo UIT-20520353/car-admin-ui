@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import uniqId from "../utils/uniqId";
 
 const Pagination = ({ page, size, total, onPageChange }) => {
   const totalPages = useMemo(() => Math.ceil(total / size), [total, size]);
@@ -32,6 +33,7 @@ const Pagination = ({ page, size, total, onPageChange }) => {
 
       {Array.from({ length: totalPages }, (_, index) => (
         <button
+          key={index}
           onClick={() => onPageChange(index)}
           className={`flex items-center justify-center w-8 text-gray-600 duration-300 border border-gray-600 rounded-lg aspect-square hover:bg-custom-dark-blue-1 hover:text-white hover:border-transparent ${
             page === index &&

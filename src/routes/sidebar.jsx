@@ -3,6 +3,7 @@ import CurrencyDollarIcon from "@heroicons/react/24/outline/CurrencyDollarIcon";
 import DocumentTextIcon from "@heroicons/react/24/outline/DocumentTextIcon";
 import TruckIcon from "@heroicons/react/24/outline/TruckIcon";
 import ArrowTrendingUpIcon from "@heroicons/react/24/outline/ArrowTrendingUpIcon";
+import { TagIcon, UserIcon } from "@heroicons/react/24/outline";
 
 const iconClasses = `h-6 w-6`;
 const submenuIconClasses = `h-5 w-5`;
@@ -28,6 +29,16 @@ const routes = [
     icon: <ArrowTrendingUpIcon className={iconClasses} />,
     name: "Income & Outcome",
   },
+  {
+    path: "/item",
+    icon: <TagIcon className={iconClasses} />,
+    name: "Item",
+  },
+  // {
+  //   path: "/staff",
+  //   icon: <UserIcon className={iconClasses} />,
+  //   name: "Staff",
+  // },
   // {
   //   path: "/app/dashboard",
   //   icon: <Squares2X2Icon className={iconClasses} />,

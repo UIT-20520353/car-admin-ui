@@ -6,6 +6,9 @@ import leadsSlice from "../features/leads/leadSlice";
 import authSlice from "../redux/authSlice";
 import contractSlice from "../redux/contractSlice";
 import carSlice from "../redux/carSlice";
+import itemSlice from "../redux/itemSlice";
+import staffSlice from "../redux/staffSlice";
+import inoutSlice from "../redux/inoutSlice";
 
 const combinedReducer = {
   header: headerSlice,
@@ -15,6 +18,9 @@ const combinedReducer = {
   auth: authSlice,
   car: carSlice,
   contract: contractSlice,
+  items: itemSlice,
+  staffs: staffSlice,
+  inout: inoutSlice,
 };
 
 export default configureStore({
