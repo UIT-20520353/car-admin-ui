@@ -131,7 +131,7 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
         reset();
         onClose();
         refresh();
-        showToast("Edit contract su", EToastType.SUCCESS);
+        showToast("Edit contract successfully!", EToastType.SUCCESS);
       } else {
         showToast(editContractResult, EToastType.ERROR);
       }
@@ -153,10 +153,12 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
         note: selectedContract.note,
         date: dayjs(selectedContract.date).format("YYYY-MM-DD"),
         startDate: dayjs(selectedContract.startDate).format("YYYY-MM-DD"),
-        duration: dayjs(selectedContract.endDate).diff(
-          dayjs(selectedContract.startDate),
-          "day"
-        ),
+        duration:
+          selectedContract.duration ||
+          dayjs(selectedContract.endDate).diff(
+            dayjs(selectedContract.startDate),
+            "day"
+          ),
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -57,7 +57,7 @@ const validationSchema = yup.object({
     .number()
     .required("Duration is required")
     .typeError("Duration must be a number")
-    .min(1, "Duration must be greater than 1"),
+    .min(0, "Duration must be greater than 0"),
 });
 
 const AddModal = ({ open, size, onClose, refresh }) => {
@@ -83,7 +83,7 @@ const AddModal = ({ open, size, onClose, refresh }) => {
       note: "",
       date: dayjs().format("YYYY-MM-DD"),
       startDate: dayjs().format("YYYY-MM-DD"),
-      duration: 1,
+      duration: 0,
     },
   });
 
@@ -131,7 +131,7 @@ const AddModal = ({ open, size, onClose, refresh }) => {
         reset();
         onClose();
         refresh();
-        showToast("Thêm xe thành công!", EToastType.SUCCESS);
+        showToast("Add contract successfully!", EToastType.SUCCESS);
       } else {
         showToast(addContractResult, EToastType.ERROR);
       }
@@ -243,7 +243,6 @@ const AddModal = ({ open, size, onClose, refresh }) => {
                   type="number"
                   className="w-full input input-bordered"
                   placeholder="Enter duration"
-                  min={1}
                   {...register("duration")}
                 />
               </div>
