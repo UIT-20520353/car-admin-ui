@@ -90,13 +90,34 @@ function ContractPage() {
           topMargin="mt-2"
           TopSideButtons={<TopSideButtons onOpenAddModal={onOpenAddModal} />}
         >
-          <div className="flex items-center w-full gap-3 mb-6">
-            <SearchBar
-              searchText={filter.carId}
-              styleClass="w-1/3"
-              setSearchText={(carId) => setFilter({ carId })}
-              placeholderText="Search by car ID"
-            />
+          <div className="flex items-end w-full gap-3 mb-6">
+            <div className="flex flex-col w-1/3">
+              <span className="text-base font-medium">Car ID</span>
+              <SearchBar
+                searchText={filter.carId}
+                styleClass="w-full"
+                setSearchText={(carId) =>
+                  setFilter((prev) => ({ ...prev, carId }))
+                }
+                placeholderText="Search by car ID"
+              />
+            </div>
+            <div className="flex flex-col w-1/3">
+              <span className="text-base font-medium">Contract status</span>
+              <select
+                className="w-full select select-bordered select-sm"
+                value={filter.status}
+                onChange={(e) =>
+                  setFilter((prev) => ({ ...prev, status: e.target.value }))
+                }
+              >
+                <option value="">All</option>
+                <option value="NEW">New</option>
+                <option value="RENEW">Renew</option>
+                <option value="NEAR_EXPIRED">Near expired</option>
+                <option value="END">End</option>
+              </select>
+            </div>
             <button
               className="w-32 btn btn-primary btn-sm"
               onClick={() => setPagination({ page: 0, size: 10 })}

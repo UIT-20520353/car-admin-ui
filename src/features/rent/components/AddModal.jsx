@@ -55,6 +55,7 @@ const validationSchema = yup.object({
     }),
   payment: yup.string().required("Payment method is required"),
   feeType: yup.string().required("Fee type is required"),
+  status: yup.string().required("Status is required"),
   note: yup.string(),
   contractId: yup.string().required("Contract is required"),
 });
@@ -67,6 +68,7 @@ const AddModal = ({ open, size, onClose, refresh }) => {
   const [selectCar, setSelectCar] = useState(null);
   const [step, setStep] = useState(1);
   const [carName, setCarname] = useState("");
+  const [endDate, setEndDate] = useState(dayjs().format("YYYY-MM-DD"));
 
   const dispatch = useDispatch();
   const {
@@ -75,6 +77,7 @@ const AddModal = ({ open, size, onClose, refresh }) => {
     formState: { errors },
     reset,
     setValue,
+    watch,
   } = useForm({
     mode: "onChange",
     resolver: yupResolver(validationSchema),
@@ -87,8 +90,12 @@ const AddModal = ({ open, size, onClose, refresh }) => {
       amount: 0,
       feeType: "RENTAL_FEE",
       payment: "CASH",
+      status: "ON_TIME",
     },
   });
+
+  const startDate = watch("startDate");
+  const duration = watch("duration");
 
   const filteredCars = useMemo(() => {
     const name = carName.toLowerCase();
@@ -152,6 +159,13 @@ const AddModal = ({ open, size, onClose, refresh }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredContracts]);
+
+  useEffect(() => {
+    const newEndDate = dayjs(startDate)
+      .add(duration, "day")
+      .format("YYYY-MM-DD");
+    setEndDate(newEndDate);
+  }, [startDate, duration]);
 
   useEffect(() => {
     if (addRentalResult) {
@@ -247,14 +261,13 @@ const AddModal = ({ open, size, onClose, refresh }) => {
               </div>
 
               <div className="flex flex-col items-start w-full gap-1">
-                <label className="ml-3 text-base font-medium">Payment</label>
+                <label className="ml-3 text-base font-medium">Status</label>
                 <select
                   className="w-full select select-bordered"
-                  {...register("payment")}
+                  {...register("status")}
                 >
-                  <option value="CASH">Cash</option>
-                  <option value="BANK">Bank</option>
-                  <option value="SQUARE">Square</option>
+                  <option value="ON_TIME">On time</option>
+                  <option value="LATE">Late</option>
                 </select>
               </div>
             </div>
@@ -273,13 +286,15 @@ const AddModal = ({ open, size, onClose, refresh }) => {
               </div>
 
               <div className="flex flex-col items-start w-full gap-1">
-                <label className="ml-3 text-base font-medium">Amount</label>
-                <input
-                  type="text"
-                  className="w-full input input-bordered"
-                  placeholder="Enter amount"
-                  {...register("amount")}
-                />
+                <label className="ml-3 text-base font-medium">Payment</label>
+                <select
+                  className="w-full select select-bordered"
+                  {...register("payment")}
+                >
+                  <option value="CASH">Cash</option>
+                  <option value="BANK">Bank</option>
+                  <option value="SQUARE">Square</option>
+                </select>
               </div>
             </div>
 
@@ -295,12 +310,35 @@ const AddModal = ({ open, size, onClose, refresh }) => {
               </div>
 
               <div className="flex flex-col items-start w-full gap-1">
+                <label className="ml-3 text-base font-medium">End date</label>
+                <input
+                  type="date"
+                  className="w-full input input-bordered"
+                  placeholder="Emd date"
+                  value={endDate}
+                  disabled
+                />
+              </div>
+            </div>
+
+            <div className="grid w-full grid-cols-2 gap-3">
+              <div className="flex flex-col items-start w-full gap-1">
                 <label className="ml-3 text-base font-medium">Duration</label>
                 <input
                   type="text"
                   className="w-full input input-bordered"
                   placeholder="Enter duration"
                   {...register("duration")}
+                />
+              </div>
+
+              <div className="flex flex-col items-start w-full gap-1">
+                <label className="ml-3 text-base font-medium">Amount</label>
+                <input
+                  type="text"
+                  className="w-full input input-bordered"
+                  placeholder="Enter amount"
+                  {...register("amount")}
                 />
               </div>
             </div>

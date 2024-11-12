@@ -14,6 +14,9 @@ export const getRentals = createAsyncThunk(
         page: pagination.page,
         size: pagination.size,
         "carId.equals": filter.carId || null,
+        "contractId.equals": filter.contractId || null,
+        "rentalStatus.equals": filter.rentalStatus || null,
+        "paymentType.equals": filter.paymentType || null,
       },
     });
 

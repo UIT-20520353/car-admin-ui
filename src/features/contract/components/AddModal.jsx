@@ -67,12 +67,14 @@ const AddModal = ({ open, size, onClose, refresh }) => {
   const [selectCar, setSelectCar] = useState(null);
   const [step, setStep] = useState(1);
   const [carName, setCarname] = useState("");
+  const [endDate, setEndDate] = useState(dayjs().format("YYYY-MM-DD"));
 
   const {
     handleSubmit,
     register,
     formState: { errors },
     reset,
+    watch,
   } = useForm({
     mode: "onChange",
     resolver: yupResolver(validationSchema),
@@ -86,6 +88,9 @@ const AddModal = ({ open, size, onClose, refresh }) => {
       duration: 0,
     },
   });
+
+  const startDate = watch("startDate");
+  const duration = watch("duration");
 
   const handleClose = () => {
     onClose();
@@ -146,6 +151,13 @@ const AddModal = ({ open, size, onClose, refresh }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  useEffect(() => {
+    const newEndDate = dayjs(startDate)
+      .add(duration, "day")
+      .format("YYYY-MM-DD");
+    setEndDate(newEndDate);
+  }, [startDate, duration]);
 
   return (
     <div className={`modal ${open ? "modal-open" : ""}`}>
@@ -244,6 +256,19 @@ const AddModal = ({ open, size, onClose, refresh }) => {
                   className="w-full input input-bordered"
                   placeholder="Enter duration"
                   {...register("duration")}
+                />
+              </div>
+            </div>
+
+            <div className="grid w-full grid-cols-2 gap-3">
+              <div className="flex flex-col items-start w-full gap-1">
+                <label className="ml-3 text-base font-medium">End date</label>
+                <input
+                  type="date"
+                  className="w-full input input-bordered"
+                  placeholder="Emd date"
+                  value={endDate}
+                  disabled
                 />
               </div>
             </div>
