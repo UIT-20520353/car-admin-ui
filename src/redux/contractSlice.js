@@ -68,6 +68,27 @@ export const editContract = createAsyncThunk(
     }
   }
 );
+export const renewContract = createAsyncThunk(
+  "/contracts/renewContract",
+  async ({ data }, { rejectWithValue }) => {
+    const accessToken = localStorage.getItem(appConstant.TOKEN_KEY);
+    try {
+      const response = await api.post(
+        `/api/contract/renew`,
+        { ...data },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
 export const contractSlice = createSlice({
   name: "contracts",
@@ -78,6 +99,7 @@ export const contractSlice = createSlice({
     },
     addContractResult: null,
     editContractResult: null,
+    renewContractResult: null,
   },
   reducers: {
     resetAddContractResult: (state) => {
@@ -85,6 +107,9 @@ export const contractSlice = createSlice({
     },
     resetEditContractResult: (state) => {
       state.editContractResult = null;
+    },
+    resetRenewContractResult: (state) => {
+      state.renewContractResult = null;
     },
   },
   extraReducers: {
@@ -109,11 +134,21 @@ export const contractSlice = createSlice({
     [editContract.rejected]: (state, action) => {
       state.editContractResult = errors[action.payload.detail] || "Xảy ra lỗi!";
     },
+    [renewContract.fulfilled]: (state) => {
+      state.renewContractResult = "success";
+    },
+    [renewContract.rejected]: (state, action) => {
+      state.renewContractResult =
+        errors[action.payload.detail] || "Xảy ra lỗi!";
+    },
   },
 });
 
-export const { resetAddContractResult, resetEditContractResult } =
-  contractSlice.actions;
+export const {
+  resetAddContractResult,
+  resetEditContractResult,
+  resetRenewContractResult,
+} = contractSlice.actions;
 export const selectConstractState = (state) => state.contract;
 
 export default contractSlice.reducer;

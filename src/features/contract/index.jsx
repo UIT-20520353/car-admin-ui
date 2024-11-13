@@ -11,6 +11,8 @@ import { selectAuthState } from "../../redux/authSlice";
 import * as dayjs from "dayjs";
 import Pagination from "../../components/pagination";
 import EditModal from "./components/EditModal";
+import ArrowPathRoundedSquareIcon from "@heroicons/react/24/outline/ArrowPathRoundedSquareIcon";
+import RenewModal from "./components/RenewModal";
 
 const TopSideButtons = ({ onOpenAddModal }) => {
   return (
@@ -40,6 +42,7 @@ function ContractPage() {
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
   const [filter, setFilter] = useState({ carId: "" });
   const [selectedContract, setSelectedContract] = useState(null);
+  const [renewContract, setRenewContract] = useState(null);
 
   const onOpenAddModal = () => setOpenAddModal(true);
 
@@ -138,7 +141,7 @@ function ContractPage() {
                   <th>Customer Name</th>
                   <th>Contract status</th>
                   <th>Note</th>
-                  <th></th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -158,14 +161,23 @@ function ContractPage() {
                             {contract.note || "--"}
                           </p>
                         </td>
-                        <td>
+                        <td className="flex gap-2">
                           <button
-                            className={`btn btn-square btn-outline btn-sm btn-primary ${
-                              isShowEditButton(contract) ? "flex" : "hidden"
-                            }`}
+                            className={`btn btn-square btn-outline btn-sm btn-primary`}
                             onClick={() => setSelectedContract(contract)}
+                            disabled={!isShowEditButton(contract)}
                           >
                             <Pencil width={20} height={20} />
+                          </button>
+                          <button
+                            className={`btn btn-square btn-outline btn-sm btn-primary `}
+                            disabled={contract.status !== "END"}
+                            onClick={() => setRenewContract(contract)}
+                          >
+                            <ArrowPathRoundedSquareIcon
+                              width={20}
+                              height={20}
+                            />
                           </button>
                         </td>
                       </tr>
@@ -207,6 +219,12 @@ function ContractPage() {
       <EditModal
         selectedContract={selectedContract}
         onClose={() => setSelectedContract(null)}
+        size="lg"
+        refresh={() => setPagination({ page: 0, size: 10 })}
+      />
+      <RenewModal
+        selectedContract={renewContract}
+        onClose={() => setRenewContract(null)}
         size="lg"
         refresh={() => setPagination({ page: 0, size: 10 })}
       />
