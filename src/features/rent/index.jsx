@@ -26,8 +26,8 @@ const EFeeType = {
 };
 
 const ERentalStatus = {
-  LATE: { value: "LATE", label: "Late" },
-  ON_TIME: { value: "ON_TIME", label: "On time" },
+  OVERDUE: { value: "OVERDUE", label: "Overdue" },
+  INDUE: { value: "INDUE", label: "Indue" },
 };
 
 const TopSideButtons = ({ onOpenAddModal }) => {
@@ -156,8 +156,8 @@ function RentManagement() {
                 }
               >
                 <option value="">All</option>
-                <option value="LATE">Late</option>
-                <option value="ON_TIME">On time</option>
+                <option value="OVERDUE">Overdue</option>
+                <option value="INDUE">Indue</option>
               </select>
             </div>
             <div className="flex flex-col w-1/3">

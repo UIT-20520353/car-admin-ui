@@ -266,8 +266,8 @@ const AddModal = ({ open, size, onClose, refresh }) => {
                   className="w-full select select-bordered"
                   {...register("status")}
                 >
-                  <option value="ON_TIME">On time</option>
-                  <option value="LATE">Late</option>
+                  <option value="INDUE">Indue</option>
+                  <option value="OVERDUE">Overdue</option>
                 </select>
               </div>
             </div>
