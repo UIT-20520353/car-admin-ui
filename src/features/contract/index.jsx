@@ -4,7 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
 import SearchBar from "../../components/Input/SearchBar";
 import { getCars } from "../../redux/carSlice";
-import { getContracts, selectConstractState } from "../../redux/contractSlice";
+import {
+  getContracts,
+  getContractsByCar,
+  selectConstractState,
+} from "../../redux/contractSlice";
 import { setPageTitle } from "../common/headerSlice";
 import AddModal from "./components/AddModal";
 import { selectAuthState } from "../../redux/authSlice";
@@ -40,14 +44,18 @@ function ContractPage() {
   const { profile } = useSelector(selectAuthState);
   const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
-  const [filter, setFilter] = useState({ carId: "" });
+  const [filter, setFilter] = useState({ carId: "", status: "" });
   const [selectedContract, setSelectedContract] = useState(null);
   const [renewContract, setRenewContract] = useState(null);
 
   const onOpenAddModal = () => setOpenAddModal(true);
 
   const fetchContracts = useCallback(() => {
-    dispatch(getContracts({ pagination, filter }));
+    if (filter.carId === "" && filter.status === "") {
+      dispatch(getContractsByCar());
+    } else {
+      dispatch(getContracts({ pagination, filter }));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination]);
 
@@ -68,7 +76,7 @@ function ContractPage() {
 
   const onReset = () => {
     setPagination({ page: 0, size: 10 });
-    setFilter({ name: "" });
+    setFilter({ name: "", status: "" });
   };
 
   useEffect(() => {
