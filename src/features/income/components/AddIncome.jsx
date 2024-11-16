@@ -15,7 +15,8 @@ const validationSchema = yup.object({
     .required("Please input amount !"),
   itemId: yup.string().required("Please input item !"),
   note: yup.string(),
-  type: yup.string(),
+  type: yup.string().required("Please select type !"),
+  payment: yup.string().required("Please select payment !"),
 });
 
 const AddIncome = ({ open, size, onClose }) => {
@@ -42,6 +43,7 @@ const AddIncome = ({ open, size, onClose }) => {
       itemId: null,
       note: "",
       type: null,
+      payment: null,
     },
   });
 
@@ -85,6 +87,17 @@ const AddIncome = ({ open, size, onClose }) => {
                   <option value="OUTCOME">OUTCOME</option>
                 </select>
               </div>
+              <div className="flex flex-col items-start w-full gap-1">
+                <label className="ml-3 text-base font-medium">Payment</label>
+                <select
+                  className="w-full select select-bordered"
+                  {...register("payment")}
+                >
+                  <option value={null}></option>
+                  <option value="CASH">CASH</option>
+                  <option value="BANK">BANK</option>
+                </select>
+              </div>
               {!!items.total && (
                 <div className="flex flex-col items-start w-full gap-1">
                   <label className="ml-3 text-base font-medium">Item</label>
@@ -124,7 +137,8 @@ const AddIncome = ({ open, size, onClose }) => {
             <ErrorText styleClass="my-4">
               {errors?.amount?.message ||
                 errors?.type?.message ||
-                errors?.itemId?.message}
+                errors?.itemId?.message ||
+                errors?.payment?.message}
             </ErrorText>
             <div className="flex items-center justify-center w-full gap-4 mt-5">
               <button

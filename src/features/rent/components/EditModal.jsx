@@ -393,13 +393,6 @@ const EditModal = ({ rental, size, onClose, refresh }) => {
 
           <div className="flex items-center justify-center w-full gap-4 mt-5">
             <button
-              className="w-32 btn btn-outline btn-sm"
-              onClick={onCancelClick}
-              type="button"
-            >
-              {step === 2 ? "Back" : "Cancel"}
-            </button>
-            <button
               type="button"
               className="w-32 btn btn-outline btn-sm"
               onClick={() => reset()}

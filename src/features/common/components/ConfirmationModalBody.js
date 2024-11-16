@@ -7,6 +7,7 @@ import {
 import { deleteLead } from "../../leads/leadSlice";
 import { showNotification } from "../headerSlice";
 import { soldCar } from "../../../redux/carSlice";
+import { deleteRenral } from "../../../redux/rentalSlice";
 
 function ConfirmationModalBody({ extraObject, closeModal }) {
   const dispatch = useDispatch();
@@ -14,15 +15,26 @@ function ConfirmationModalBody({ extraObject, closeModal }) {
   const { message, type, _id, index } = extraObject;
 
   const proceedWithYes = async () => {
+    console.log(type);
     switch (type) {
       case CONFIRMATION_MODAL_CLOSE_TYPES.LEAD_DELETE:
         dispatch(deleteLead({ index }));
         dispatch(showNotification({ message: "Lead Deleted!", status: 1 }));
+        closeModal();
+        return;
       case CONFIRMATION_MODAL_CLOSE_TYPES.SOLD_CAR:
         dispatch(soldCar({ id: index }));
         dispatch(showNotification({ message: "Car Sold!", status: 1 }));
+        closeModal();
+        return;
+      case CONFIRMATION_MODAL_CLOSE_TYPES.DELETE_RENTAL:
+        dispatch(deleteRenral({ id: index }));
+        dispatch(showNotification({ message: "Rental Deleted!", status: 1 }));
+        closeModal();
+        return;
+      default:
+        return;
     }
-    closeModal();
   };
 
   return (

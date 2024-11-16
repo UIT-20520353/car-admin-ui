@@ -184,17 +184,12 @@ const AddModal = ({ open, size, onClose, refresh }) => {
   }, [open]);
 
   useEffect(() => {
-    if (filteredContracts.length) {
-      const today = dayjs();
-      const contract = filteredContracts.find(
-        (c) =>
-          dayjs(c.startDate).isSameOrBefore(today, "day") &&
-          dayjs(c.endDate).isSameOrAfter(today, "day")
-      );
-
-      setSelectedContract(contract);
+    if (selectCar && selectCar.contractDto) {
+      setSelectedContract(selectCar.contractDto);
+    } else {
+      setSelectedContract(null);
     }
-  }, [filteredContracts]);
+  }, [selectCar]);
 
   return (
     <div className={`modal ${open ? "modal-open" : ""}`}>

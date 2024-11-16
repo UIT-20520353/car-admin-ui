@@ -25,6 +25,17 @@ export const getInOuts = createAsyncThunk(
     };
   }
 );
+
+export const getPnl = createAsyncThunk("/inout/getPnl", async () => {
+  const accessToken = localStorage.getItem(appConstant.TOKEN_KEY);
+  const response = await api.get("/api/in-out/total", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  return response.data;
+});
 export const addInout = createAsyncThunk(
   "/inout/addInout",
   async (data, { rejectWithValue }) => {
@@ -63,6 +74,12 @@ export const editInout = createAsyncThunk(
 export const inoutSlice = createSlice({
   name: "inout",
   initialState: {
+    pnl: {
+      totalInCash: 0,
+      totalInBank: 0,
+      totalOutCash: 0,
+      totalOutBank: 0,
+    },
     inouts: {
       list: [],
       total: 0,
@@ -82,6 +99,17 @@ export const inoutSlice = createSlice({
       state.inouts = {
         list: [],
         total: 0,
+      };
+    },
+    [getPnl.fulfilled]: (state, action) => {
+      state.pnl = action.payload;
+    },
+    [getPnl.rejected]: (state) => {
+      state.pnl = {
+        totalInCash: 0,
+        totalInBank: 0,
+        totalOutCash: 0,
+        totalOutBank: 0,
       };
     },
     [addInout.fulfilled]: (state) => {

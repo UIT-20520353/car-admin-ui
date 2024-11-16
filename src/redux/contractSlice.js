@@ -13,7 +13,7 @@ export const getContracts = createAsyncThunk(
       params: {
         page: pagination.page,
         size: pagination.size,
-        "carId.equals": filter.carId || null,
+        "registrationPlate.equals": filter.registrationPlate || null,
         "status.in": filter.status || null,
       },
     });

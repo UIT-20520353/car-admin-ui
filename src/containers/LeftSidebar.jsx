@@ -1,10 +1,15 @@
-import { TagIcon, UserIcon } from "@heroicons/react/24/outline";
+import {
+  TagIcon,
+  UserIcon,
+  DocumentArrowDownIcon,
+} from "@heroicons/react/24/outline";
 import XMarkIcon from "@heroicons/react/24/outline/XMarkIcon";
 import { useSelector } from "react-redux";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { selectAuthState } from "../redux/authSlice";
 import routes from "../routes/sidebar";
 import SidebarSubmenu from "./SidebarSubmenu";
+import { ExclamationTriangleIcon } from "@heroicons/react/16/solid";
 
 function LeftSidebar() {
   const location = useLocation();
@@ -91,6 +96,23 @@ function LeftSidebar() {
               >
                 <UserIcon className="w-6 h-6" /> Staff
                 {location.pathname === "/staff" ? (
+                  <span
+                    className="absolute inset-y-0 left-0 w-1 rounded-tr-md rounded-br-md bg-primary "
+                    aria-hidden="true"
+                  ></span>
+                ) : null}
+              </NavLink>
+            </li>
+            <li className="">
+              <NavLink
+                end
+                to="/logs"
+                className={({ isActive }) =>
+                  `${isActive ? "font-semibold  bg-base-200 " : "font-normal"}`
+                }
+              >
+                <DocumentArrowDownIcon className="h-6 w-6" /> Log Tracking
+                {location.pathname === "/logs" ? (
                   <span
                     className="absolute inset-y-0 left-0 w-1 rounded-tr-md rounded-br-md bg-primary "
                     aria-hidden="true"

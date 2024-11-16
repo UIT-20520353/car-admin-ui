@@ -12,7 +12,7 @@ const EndModal = ({ selectedContract, size, onClose, refresh }) => {
   const { endContractResult } = useSelector(selectConstractState);
 
   const handleEndContract = () => {
-    dispatch(endContract(selectedContract.car.id));
+    dispatch(endContract(selectedContract.id));
   };
 
   useEffect(() => {

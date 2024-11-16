@@ -17,6 +17,13 @@ import { getRentals, selectRentalState } from "../../redux/rentalSlice";
 import { setPageTitle } from "../common/headerSlice";
 import AddModal from "./components/AddModal";
 import EditModal from "./components/EditModal";
+import { DocumentArrowDownIcon, TrashIcon } from "@heroicons/react/24/outline";
+import {
+  CONFIRMATION_MODAL_CLOSE_TYPES,
+  MODAL_BODY_TYPES,
+} from "../../utils/globalConstantUtil";
+import { openModal } from "../common/modalSlice";
+import LogModal from "../common/LogModal";
 
 const EPayment = {
   CASH: { value: "CASH", label: "Cash" },
@@ -50,7 +57,7 @@ const TopSideButtons = ({ onOpenAddModal }) => {
 
 function RentManagement() {
   const dispatch = useDispatch();
-  const { rentals } = useSelector(selectRentalState);
+  const { rentals, deleteCarResult } = useSelector(selectRentalState);
   const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
   const [filter, setFilter] = useState({
@@ -61,12 +68,13 @@ function RentManagement() {
   });
   const { profile } = useSelector(selectAuthState);
   const [selectedRental, setSelectedRental] = useState(null);
+  const [selectedLog, setSelectedLog] = useState(null);
   const loaderRef = useRef(null);
 
   const fetchContracts = useCallback(() => {
     dispatch(getRentals({ pagination, filter }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination]);
+  }, [pagination, deleteCarResult]);
 
   const onOpenAddModal = () => setOpenAddModal(true);
 
@@ -133,6 +141,20 @@ function RentManagement() {
     };
   }, [rentals]);
 
+  const onDeleteRental = (payment) => {
+    dispatch(
+      openModal({
+        title: "Delete payment",
+        bodyType: MODAL_BODY_TYPES.CONFIRMATION,
+        extraObject: {
+          message: `Are you sure you want to delete this payment?`,
+          type: CONFIRMATION_MODAL_CLOSE_TYPES.DELETE_RENTAL,
+          index: payment.id,
+        },
+      })
+    );
+  };
+
   return (
     <Fragment>
       <div>
@@ -196,8 +218,7 @@ function RentManagement() {
                   <th>Status</th>
                   <th>Amount</th>
                   <th>Note</th>
-
-                  <th></th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -221,7 +242,7 @@ function RentManagement() {
                             {rental.note || "--"}
                           </p>
                         </td>
-                        <td>
+                        <td className="flex gap-2">
                           <button
                             className={`btn btn-square btn-outline btn-sm btn-primary ${
                               isShowEditButton(rental) ? "flex" : "hidden"
@@ -229,6 +250,20 @@ function RentManagement() {
                             onClick={() => setSelectedRental(rental)}
                           >
                             <Pencil width={20} height={20} />
+                          </button>
+                          <button
+                            className={`btn btn-square btn-outline btn-sm btn-danger ${
+                              isShowEditButton(rental) ? "flex" : "hidden"
+                            }`}
+                            onClick={() => onDeleteRental(rental)}
+                          >
+                            <TrashIcon width={20} height={20} />
+                          </button>
+                          <button
+                            className={`btn btn-square btn-outline btn-sm btn-success`}
+                            onClick={() => setSelectedLog(rental)}
+                          >
+                            <DocumentArrowDownIcon width={20} height={20} />
                           </button>
                         </td>
                       </tr>
@@ -263,6 +298,12 @@ function RentManagement() {
         onClose={() => setSelectedRental(null)}
         size="lg"
         refresh={() => setPagination({ page: 0, size: 10 })}
+      />
+      <LogModal
+        item={selectedLog}
+        onClose={() => setSelectedLog(null)}
+        size="lg"
+        cate={"RENTAL"}
       />
     </Fragment>
   );

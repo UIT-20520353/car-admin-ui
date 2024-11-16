@@ -24,6 +24,8 @@ import EditModal from "./components/EditModal";
 import RenewModal from "./components/RenewModal";
 import NoSymbolIcon from "@heroicons/react/24/outline/NoSymbolIcon";
 import EndModal from "./components/EndModal";
+import { DocumentArrowDownIcon } from "@heroicons/react/24/outline";
+import LogModal from "../common/LogModal";
 
 const TopSideButtons = ({ onOpenAddModal }) => {
   return (
@@ -51,22 +53,23 @@ function ContractPage() {
   const { profile } = useSelector(selectAuthState);
   const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
-  const [filter, setFilter] = useState({ carId: "", status: "" });
+  const [filter, setFilter] = useState({ registrationPlate: "", status: "" });
   const [selectedContract, setSelectedContract] = useState(null);
   const [renewContract, setRenewContract] = useState(null);
   const [selectedContactToEnd, setSelectedContractToEnd] = useState(null);
+  const [selectedLog, setSelectedLog] = useState(null);
   const loaderRef = useRef(null);
 
   const onOpenAddModal = () => setOpenAddModal(true);
 
   const fetchContracts = useCallback(() => {
-    if (filter.carId === "" && filter.status === "") {
+    if (filter.registrationPlate === "" && filter.status === "") {
       dispatch(getContractsByCar());
     } else {
       dispatch(getContracts({ pagination, filter }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination]);
+  }, [pagination, filter]);
 
   const isShowEditButton = (contract) => {
     const isLessThan24Hours =
@@ -85,7 +88,7 @@ function ContractPage() {
 
   const onReset = () => {
     setPagination({ page: 0, size: 10 });
-    setFilter({ name: "", status: "" });
+    setFilter({ registrationPlate: "", status: "" });
   };
 
   useEffect(() => {
@@ -95,7 +98,7 @@ function ContractPage() {
 
   useEffect(() => {
     fetchContracts();
-  }, [fetchContracts]);
+  }, [pagination]);
 
   useEffect(() => {
     dispatch(getCars({ pagination: { page: 0, size: 9999 }, filter: {} }));
@@ -139,14 +142,14 @@ function ContractPage() {
         >
           <div className="flex items-end w-full gap-3 mb-6">
             <div className="flex flex-col w-1/3">
-              <span className="text-base font-medium">Car ID</span>
+              <span className="text-base font-medium">Registration plate</span>
               <SearchBar
-                searchText={filter.carId}
+                searchText={filter.registrationPlate}
                 styleClass="w-full"
-                setSearchText={(carId) =>
-                  setFilter((prev) => ({ ...prev, carId }))
+                setSearchText={(registrationPlate) =>
+                  setFilter((prev) => ({ ...prev, registrationPlate }))
                 }
-                placeholderText="Search by car ID"
+                placeholderText="Search by Registration plate"
               />
             </div>
             <div className="flex flex-col w-1/3">
@@ -179,7 +182,7 @@ function ContractPage() {
             <table className="table w-full">
               <thead>
                 <tr>
-                  <th>Car ID</th>
+                  <th>Registration plate</th>
                   <th>Start date</th>
                   <th>End date</th>
                   <th>Customer Name</th>
@@ -193,7 +196,7 @@ function ContractPage() {
                   <Fragment>
                     {contracts.list.map((contract) => (
                       <tr key={`contract-${contract.id}`}>
-                        <td>#{contract.car.id}</td>
+                        <td>{contract.car.registrationPlate}</td>
                         <td>
                           {dayjs(contract.startDate).format("DD/MM/YYYY")}
                         </td>
@@ -229,6 +232,12 @@ function ContractPage() {
                             onClick={() => setSelectedContractToEnd(contract)}
                           >
                             <NoSymbolIcon width={20} height={20} />
+                          </button>
+                          <button
+                            className={`btn btn-square btn-outline btn-sm btn-success`}
+                            onClick={() => setSelectedLog(contract)}
+                          >
+                            <DocumentArrowDownIcon width={20} height={20} />
                           </button>
                         </td>
                       </tr>
@@ -275,6 +284,12 @@ function ContractPage() {
         onClose={() => setSelectedContractToEnd(null)}
         size="lg"
         refresh={() => setPagination({ page: 0, size: 10 })}
+      />
+      <LogModal
+        item={selectedLog}
+        onClose={() => setSelectedLog(null)}
+        size="lg"
+        cate={"CONTRACT"}
       />
     </Fragment>
   );

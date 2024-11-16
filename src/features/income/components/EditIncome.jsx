@@ -5,7 +5,7 @@ import ErrorText from "../../../components/Typography/ErrorText";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch, useSelector } from "react-redux";
 import useHandleResponse from "../../../hooks/useHandleResponse";
-import { addInout } from "../../../redux/inoutSlice";
+import { addInout, editInout } from "../../../redux/inoutSlice";
 import { getItems, selectItems } from "../../../redux/itemSlice";
 import { selectAuthState } from "../../../redux/authSlice";
 import { hoursBetween } from "../../../utils/date";
@@ -17,7 +17,8 @@ const validationSchema = yup.object({
     .required("Please input amount !"),
   itemId: yup.string().required("Please input item !"),
   note: yup.string(),
-  type: yup.string(),
+  type: yup.string().required("Please select type !"),
+  payment: yup.string().required("Please select payment !"),
 });
 
 const EditIncome = ({ size, onClose, refresh, inout }) => {
@@ -46,6 +47,7 @@ const EditIncome = ({ size, onClose, refresh, inout }) => {
       itemId: null,
       note: "",
       type: null,
+      payment: null,
     },
   });
 
@@ -58,7 +60,7 @@ const EditIncome = ({ size, onClose, refresh, inout }) => {
   };
 
   const onSubmit = (data) => {
-    dispatch(addInout(data)).then((response) =>
+    dispatch(editInout({ id: inout.id, data })).then((response) =>
       handleResponse(response, `Edit successfully`, handleClose)
     );
   };
@@ -74,6 +76,7 @@ const EditIncome = ({ size, onClose, refresh, inout }) => {
       setValue("note", inout.note);
       setValue("itemId", inoutItem.id);
       setValue("type", inout.type);
+      setValue("payment", inout.payment);
     } else {
       reset();
     }
@@ -85,6 +88,7 @@ const EditIncome = ({ size, onClose, refresh, inout }) => {
     setValue("note", inout.note);
     setValue("itemId", inoutItem.id);
     setValue("type", inout.type);
+    setValue("payment", inout.payment);
   };
 
   const enableEdit = useMemo(() => {
@@ -124,6 +128,18 @@ const EditIncome = ({ size, onClose, refresh, inout }) => {
                   <option value={null}></option>
                   <option value="INCOME">INCOME</option>
                   <option value="OUTCOME">OUTCOME</option>
+                </select>
+              </div>
+              <div className="flex flex-col items-start w-full gap-1">
+                <label className="ml-3 text-base font-medium">Payment</label>
+                <select
+                  className="w-full select select-bordered"
+                  {...register("payment")}
+                  disabled={!enableEdit}
+                >
+                  <option value={null}></option>
+                  <option value="CASH">CASH</option>
+                  <option value="BANK">BANK</option>
                 </select>
               </div>
               {!!items.total && (
@@ -168,7 +184,8 @@ const EditIncome = ({ size, onClose, refresh, inout }) => {
             <ErrorText styleClass="my-4">
               {errors?.amount?.message ||
                 errors?.type?.message ||
-                errors?.itemId?.message}
+                errors?.itemId?.message ||
+                errors?.payment?.message}
             </ErrorText>
             {enableEdit && (
               <div className="flex items-center justify-center w-full gap-4 mt-5">

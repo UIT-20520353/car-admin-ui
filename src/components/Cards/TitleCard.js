@@ -20,7 +20,7 @@ function TitleCard({ title, children, topMargin, TopSideButtons }) {
       <div className="mt-2 divider"></div>
 
       {/** Card Body */}
-      <div className="w-full h-full pb-6 bg-base-100">{children}</div>
+      <div className="w-full h-full pb-6 bg-base-100 ">{children}</div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import appConstant, { errors } from "../app/constant";
 import api from "../app/http";
+import uniqId from "../utils/uniqId";
 
 export const getRentals = createAsyncThunk(
   "/rentals/getRentals",
@@ -49,6 +50,24 @@ export const addRental = createAsyncThunk(
   }
 );
 
+export const deleteRenral = createAsyncThunk(
+  "rentals/deleteRental",
+  async ({ id }, { rejectWithValue }) => {
+    const accessToken = localStorage.getItem(appConstant.TOKEN_KEY);
+    try {
+      const response = await api.post(`/api/rental/delete/${id}`, null, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const editRental = createAsyncThunk(
   "/rentals/editRental",
   async ({ data, id }, { rejectWithValue }) => {
@@ -80,6 +99,7 @@ export const rentalSlice = createSlice({
     },
     addRentalResult: null,
     editRentalResult: null,
+    deleteCarResult: null,
   },
   reducers: {
     resetAddRentalResult: (state) => {
@@ -110,6 +130,12 @@ export const rentalSlice = createSlice({
     },
     [editRental.rejected]: (state, action) => {
       state.editRentalResult = errors[action.payload.detail] || "Xảy ra lỗi!";
+    },
+    [deleteRenral.fulfilled]: (state) => {
+      state.deleteCarResult = uniqId();
+    },
+    [deleteRenral.rejected]: (state, action) => {
+      state.deleteCarResult = null;
     },
   },
 });

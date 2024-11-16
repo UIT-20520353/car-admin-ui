@@ -1,4 +1,4 @@
-import { PencilIcon } from "@heroicons/react/24/outline";
+import { DocumentArrowDownIcon, PencilIcon } from "@heroicons/react/24/outline";
 import React, {
   Fragment,
   useCallback,
@@ -8,11 +8,12 @@ import React, {
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
-import { getInOuts, selectInoutState } from "../../redux/inoutSlice";
+import { getInOuts, getPnl, selectInoutState } from "../../redux/inoutSlice";
 import { formatDateNoTime } from "../../utils/date";
 import { setPageTitle } from "../common/headerSlice";
 import AddIncome from "./components/AddIncome";
 import EditIncome from "./components/EditIncome";
+import LogModal from "../common/LogModal";
 // import AddModal from "./components/AddModal";
 
 const TopSideButtons = ({ onOpenAddIncome }) => {
@@ -30,12 +31,13 @@ const TopSideButtons = ({ onOpenAddIncome }) => {
 
 function IncomeOutcomePage() {
   const dispatch = useDispatch();
-  const { inouts, updateResult } = useSelector(selectInoutState);
+  const { inouts, updateResult, pnl } = useSelector(selectInoutState);
   const [isOpenAddIncome, setOpenAddIncome] = useState(false);
   // const [searchText, setSearchText] = useState("");
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
   const [selectedItem, setSelectedItem] = useState(null);
   const [filter, setFilter] = useState({ name: "", type: "" });
+  const [selectedLog, setSelectedLog] = useState(null);
   const loaderRef = useRef(null);
 
   const onOpenAddIncome = () => setOpenAddIncome(true);
@@ -47,6 +49,7 @@ function IncomeOutcomePage() {
 
   const fetchItems = useCallback(() => {
     dispatch(getInOuts({ pagination, filter }));
+    dispatch(getPnl());
   }, [updateResult, pagination]);
 
   const renderStatus = (inout) => {
@@ -111,7 +114,7 @@ function IncomeOutcomePage() {
           topMargin="mt-2"
           TopSideButtons={<TopSideButtons onOpenAddIncome={onOpenAddIncome} />}
         >
-          <div className="w-full overflow-x-auto scroll-custom">
+          <div className="w-full overflow-x-auto scroll-custom max-h-[500px] overflow-y-auto">
             <table className="table w-full">
               <thead>
                 <tr>
@@ -143,12 +146,18 @@ function IncomeOutcomePage() {
                           {car.createdUser.username}
                         </td>
                         <td>{car.note}</td>
-                        <td>
+                        <td className="flex gap-2">
                           <button
                             className="btn btn-square btn-outline btn-sm btn-primary"
                             onClick={() => setSelectedItem(car)}
                           >
                             <PencilIcon width={20} height={20} />
+                          </button>
+                          <button
+                            className={`btn btn-square btn-outline btn-sm btn-success`}
+                            onClick={() => setSelectedLog(car)}
+                          >
+                            <DocumentArrowDownIcon width={20} height={20} />
                           </button>
                         </td>
                       </tr>
@@ -169,6 +178,32 @@ function IncomeOutcomePage() {
               </tbody>
             </table>
           </div>
+          {pnl && (
+            <div className="flex flex-col items-end">
+              <div className="flex justify-between w-[500px] font-bold">
+                <p>Income By Cash:</p> <p>{pnl.totalInCash}</p>
+              </div>
+              <div className="flex justify-between w-[500px] font-bold">
+                <p>Income By Bank:</p> <p>{pnl.totalInBank}</p>
+              </div>
+              <div className="flex justify-between w-[500px] font-bold">
+                <p>Outcome By Cash:</p> <p>{pnl.totalOutCash}</p>
+              </div>
+              <div className="flex justify-between w-[500px] font-bold">
+                <p>Outcome By Bank:</p> <p>{pnl.totalOutBank}</p>
+              </div>
+              <div className="flex justify-between w-[500px] font-bold border-t-2 border-black"></div>
+              <div className="flex justify-between w-[500px] font-bold">
+                <p>Total:</p>{" "}
+                <p>
+                  {Number(pnl.totalInCash) +
+                    Number(pnl.totalInBank) -
+                    Number(pnl.totalOutCash) -
+                    Number(pnl.totalOutBank)}
+                </p>
+              </div>
+            </div>
+          )}
         </TitleCard>
       </div>
 
@@ -182,6 +217,12 @@ function IncomeOutcomePage() {
         onClose={() => setSelectedItem(null)}
         refresh={() => setPagination({ page: 0, size: 10 })}
         size="lg"
+      />
+      <LogModal
+        item={selectedLog}
+        onClose={() => setSelectedLog(null)}
+        size="lg"
+        cate={"IN_OUT"}
       />
     </Fragment>
   );

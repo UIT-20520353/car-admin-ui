@@ -1,4 +1,7 @@
-import { BanknotesIcon } from "@heroicons/react/24/outline";
+import {
+  BanknotesIcon,
+  DocumentArrowDownIcon,
+} from "@heroicons/react/24/outline";
 import Pencil from "@heroicons/react/24/outline/PencilIcon";
 import React, {
   Fragment,
@@ -21,6 +24,7 @@ import { setPageTitle } from "../common/headerSlice";
 import { openModal } from "../common/modalSlice";
 import AddModal from "./components/AddModal";
 import EditModal from "./components/EditModal";
+import LogModal from "../common/LogModal";
 
 const TopSideButtons = ({ onOpenAddModal }) => {
   return (
@@ -43,6 +47,7 @@ function CarManagement() {
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
   const [selectedCar, setSelectedCar] = useState(null);
   const [filter, setFilter] = useState({ name: "", status: "" });
+  const [selectedLog, setSelectedLog] = useState(null);
   const loaderRef = useRef(null);
 
   const onOpenAddModal = () => setOpenAddModal(true);
@@ -111,7 +116,7 @@ function CarManagement() {
         bodyType: MODAL_BODY_TYPES.CONFIRMATION,
         extraObject: {
           message: `Are you sure you want to sold this car: ${car.name}?`,
-          type: CONFIRMATION_MODAL_CLOSE_TYPES.LEAD_DELETE,
+          type: CONFIRMATION_MODAL_CLOSE_TYPES.SOLD_CAR,
           index: car.id,
         },
       })
@@ -222,10 +227,20 @@ function CarManagement() {
                           </button>
                           <button
                             className={`btn btn-square btn-outline btn-sm btn-danger `}
-                            disabled={profile?.role !== "ADMIN" || car.isSold}
+                            disabled={
+                              profile?.role !== "ADMIN" ||
+                              car.isSold ||
+                              car.status === "ON_RENT"
+                            }
                             onClick={() => onSoldCar(car)}
                           >
                             <BanknotesIcon width={20} height={20} />
+                          </button>
+                          <button
+                            className={`btn btn-square btn-outline btn-sm btn-success`}
+                            onClick={() => setSelectedLog(car)}
+                          >
+                            <DocumentArrowDownIcon width={20} height={20} />
                           </button>
                         </td>
                       </tr>
@@ -260,6 +275,12 @@ function CarManagement() {
         onClose={() => setSelectedCar(null)}
         refresh={() => setPagination({ page: 0, size: 10 })}
         size="lg"
+      />
+      <LogModal
+        item={selectedLog}
+        onClose={() => setSelectedLog(null)}
+        size="lg"
+        cate={"CAR"}
       />
     </Fragment>
   );

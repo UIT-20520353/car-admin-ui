@@ -10,6 +10,7 @@ import IncomeOutcomePage from "../features/income";
 import ItemPage from "../features/item";
 import StaffPage from "../features/staff";
 import { selectAuthState } from "../redux/authSlice";
+import LogPage from "../features/logs";
 // import routes from "../routes";
 
 function PageContent() {
@@ -37,11 +38,10 @@ function PageContent() {
             <Route path="/cars" element={<CarManagement />} />
             <Route path="/contracts" element={<ContractPage />} />
             <Route path="/income-outcome" element={<IncomeOutcomePage />} />
-            <Route path="/item" element={<ItemPage />} />
-            {profile?.role === "ADMIN" && (
-              <Route path="/staff" element={<StaffPage />} />
-            )}
 
+            <Route path="/staff" element={<StaffPage />} />
+            <Route path="/item" element={<ItemPage />} />
+            <Route path="/logs" element={<LogPage />} />
             <Route index element={<RentManagement />} />
             {/* {routes.map((route, key) => {
               return (
