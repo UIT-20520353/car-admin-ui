@@ -107,6 +107,24 @@ export const renewContract = createAsyncThunk(
   }
 );
 
+export const endContract = createAsyncThunk(
+  "/contracts/endContract",
+  async (id, { rejectWithValue }) => {
+    const accessToken = localStorage.getItem(appConstant.TOKEN_KEY);
+    try {
+      const response = await api.post(`/api/contract/end/${id}`, null, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const contractSlice = createSlice({
   name: "contracts",
   initialState: {
@@ -117,6 +135,7 @@ export const contractSlice = createSlice({
     addContractResult: null,
     editContractResult: null,
     renewContractResult: null,
+    endContractResult: null,
   },
   reducers: {
     resetAddContractResult: (state) => {
@@ -127,6 +146,9 @@ export const contractSlice = createSlice({
     },
     resetRenewContractResult: (state) => {
       state.renewContractResult = null;
+    },
+    resetEndContractResult: (state) => {
+      state.endContractResult = null;
     },
   },
   extraReducers: {
@@ -167,6 +189,12 @@ export const contractSlice = createSlice({
       state.renewContractResult =
         errors[action.payload.detail] || "Xảy ra lỗi!";
     },
+    [endContract.fulfilled]: (state) => {
+      state.endContractResult = "success";
+    },
+    [endContract.rejected]: (state, action) => {
+      state.endContractResult = errors[action.payload.detail] || "Xảy ra lỗi!";
+    },
   },
 });
 
@@ -174,6 +202,7 @@ export const {
   resetAddContractResult,
   resetEditContractResult,
   resetRenewContractResult,
+  resetEndContractResult,
 } = contractSlice.actions;
 export const selectConstractState = (state) => state.contract;
 

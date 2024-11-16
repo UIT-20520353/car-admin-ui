@@ -1,14 +1,17 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import { PencilIcon } from "@heroicons/react/24/outline";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
+import { getInOuts, selectInoutState } from "../../redux/inoutSlice";
+import { formatDateNoTime } from "../../utils/date";
 import { setPageTitle } from "../common/headerSlice";
 import AddIncome from "./components/AddIncome";
-import AddOutcome from "./components/AddOutcome";
-import { selectAuthState } from "../../redux/authSlice";
-import { getInOuts, selectInoutState } from "../../redux/inoutSlice";
-import Pagination from "../../components/pagination";
-import { formatDateNoTime } from "../../utils/date";
-import { PencilIcon } from "@heroicons/react/24/outline";
 import EditIncome from "./components/EditIncome";
 // import AddModal from "./components/AddModal";
 
@@ -27,13 +30,13 @@ const TopSideButtons = ({ onOpenAddIncome }) => {
 
 function IncomeOutcomePage() {
   const dispatch = useDispatch();
-  const { profile } = useSelector(selectAuthState);
   const { inouts, updateResult } = useSelector(selectInoutState);
   const [isOpenAddIncome, setOpenAddIncome] = useState(false);
   // const [searchText, setSearchText] = useState("");
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
   const [selectedItem, setSelectedItem] = useState(null);
   const [filter, setFilter] = useState({ name: "", type: "" });
+  const loaderRef = useRef(null);
 
   const onOpenAddIncome = () => setOpenAddIncome(true);
 
@@ -73,6 +76,33 @@ function IncomeOutcomePage() {
     fetchItems();
   }, [fetchItems]);
 
+  const handleIntersection = (entries, observer) => {
+    const entry = entries[0];
+
+    // When the loaderRef element intersects the viewport, fetch more data
+    if (entry.isIntersecting && inouts.total > inouts.list.length) {
+      setPagination((prev) => ({ ...prev, size: prev.size + 10 }));
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleIntersection, {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0,
+    });
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [inouts]);
+
   return (
     <Fragment>
       <div>
@@ -87,10 +117,11 @@ function IncomeOutcomePage() {
                 <tr>
                   <th>Id</th>
                   <th className="text-center">Type</th>
+                  <th>Created Date</th>
                   <th>Amount</th>
                   <th>Item</th>
                   <th>Created User</th>
-                  <th>Created Date</th>
+                  <th>Note</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -103,14 +134,15 @@ function IncomeOutcomePage() {
                         <td className="flex justify-center">
                           {renderStatus(car)}
                         </td>
+                        <td className="text-base">
+                          {formatDateNoTime(car.createdDate)}
+                        </td>
                         <td className="text-base">{car.amount}</td>
                         <td className="text-base">{car.item}</td>
                         <td className="text-base">
                           {car.createdUser.username}
                         </td>
-                        <td className="text-base">
-                          {formatDateNoTime(car.createdDate)}
-                        </td>
+                        <td>{car.note}</td>
                         <td>
                           <button
                             className="btn btn-square btn-outline btn-sm btn-primary"
@@ -121,30 +153,21 @@ function IncomeOutcomePage() {
                         </td>
                       </tr>
                     ))}
+                    <tr>
+                      <td colSpan={8}>
+                        <div ref={loaderRef} />
+                      </td>
+                    </tr>
                   </Fragment>
                 ) : (
                   <tr>
-                    <td colSpan={4} className="text-center">
+                    <td colSpan={8} className="text-center">
                       Data not found
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
-            <div
-              className={`flex items-center justify-end w-full mt-4 ${
-                inouts.total === 0 ? "hidden" : "flex"
-              }`}
-            >
-              <Pagination
-                total={inouts.total}
-                page={pagination.page}
-                size={pagination.size}
-                onPageChange={(page) =>
-                  setPagination((prev) => ({ ...prev, page }))
-                }
-              />
-            </div>
           </div>
         </TitleCard>
       </div>

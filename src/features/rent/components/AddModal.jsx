@@ -1,6 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,6 +17,7 @@ import {
 } from "../../../redux/rentalSlice";
 
 dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 const minDate = dayjs().startOf("day");
 
@@ -57,7 +59,6 @@ const validationSchema = yup.object({
   feeType: yup.string().required("Fee type is required"),
   status: yup.string().required("Status is required"),
   note: yup.string(),
-  contractId: yup.string().required("Contract is required"),
 });
 
 const AddModal = ({ open, size, onClose, refresh }) => {
@@ -69,6 +70,7 @@ const AddModal = ({ open, size, onClose, refresh }) => {
   const [step, setStep] = useState(1);
   const [carName, setCarname] = useState("");
   const [endDate, setEndDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [selectedContract, setSelectedContract] = useState(null);
 
   const dispatch = useDispatch();
   const {
@@ -76,7 +78,6 @@ const AddModal = ({ open, size, onClose, refresh }) => {
     register,
     formState: { errors },
     reset,
-    setValue,
     watch,
   } = useForm({
     mode: "onChange",
@@ -139,7 +140,7 @@ const AddModal = ({ open, size, onClose, refresh }) => {
   };
 
   const onSubmit = (data) => {
-    dispatch(addRental({ data }));
+    dispatch(addRental({ ...data, contractId: selectedContract.id }));
   };
 
   const errorText =
@@ -152,13 +153,6 @@ const AddModal = ({ open, size, onClose, refresh }) => {
     errors?.feeType?.message ||
     errors?.contractId?.message ||
     "";
-
-  useEffect(() => {
-    if (filteredContracts.length > 0) {
-      setValue("contractId", filteredContracts[0].id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredContracts]);
 
   useEffect(() => {
     const newEndDate = dayjs(startDate)
@@ -188,6 +182,19 @@ const AddModal = ({ open, size, onClose, refresh }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  useEffect(() => {
+    if (filteredContracts.length) {
+      const today = dayjs();
+      const contract = filteredContracts.find(
+        (c) =>
+          dayjs(c.startDate).isSameOrBefore(today, "day") &&
+          dayjs(c.endDate).isSameOrAfter(today, "day")
+      );
+
+      setSelectedContract(contract);
+    }
+  }, [filteredContracts]);
 
   return (
     <div className={`modal ${open ? "modal-open" : ""}`}>
@@ -241,23 +248,21 @@ const AddModal = ({ open, size, onClose, refresh }) => {
             <div className="grid w-full grid-cols-2 gap-3">
               <div className="flex flex-col items-start w-full gap-1">
                 <label className="ml-3 text-base font-medium">Contract</label>
-                <select
-                  className="w-full select select-bordered"
-                  {...register("contractId")}
-                >
-                  {filteredContracts.map((contract) => (
-                    <option
-                      key={`contract-option-${contract.id}`}
-                      value={contract.id}
-                    >
-                      <p className="break-all whitespace-pre">{`${
-                        contract.customerName
-                      } - ${dayjs(contract.startDate).format(
-                        "DD/MM/YYYY"
-                      )} - ${dayjs(contract.endDate).format("DD/MM/YYYY")}`}</p>
-                    </option>
-                  ))}
-                </select>
+                <input
+                  type="text"
+                  className="w-full input input-bordered"
+                  placeholder="Contract"
+                  value={
+                    selectedContract
+                      ? `${selectedContract.customerName} - ${dayjs(
+                          selectedContract.startDate
+                        ).format("DD/MM/YYYY")} - ${dayjs(
+                          selectedContract.endDate
+                        ).format("DD/MM/YYYY")}`
+                      : ""
+                  }
+                  disabled
+                />
               </div>
 
               <div className="flex flex-col items-start w-full gap-1">
@@ -427,6 +432,7 @@ const AddModal = ({ open, size, onClose, refresh }) => {
                 step === 1 && "hidden"
               }`}
               type="submit"
+              disabled={!selectedContract}
             >
               Save
             </button>

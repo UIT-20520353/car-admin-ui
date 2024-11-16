@@ -1,16 +1,21 @@
 import Pencil from "@heroicons/react/24/outline/PencilIcon";
 import * as dayjs from "dayjs";
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
 import SearchBar from "../../components/Input/SearchBar";
-import Pagination from "../../components/pagination";
+import { selectAuthState } from "../../redux/authSlice";
 import { getCars } from "../../redux/carSlice";
 import { getContracts } from "../../redux/contractSlice";
 import { getRentals, selectRentalState } from "../../redux/rentalSlice";
 import { setPageTitle } from "../common/headerSlice";
 import AddModal from "./components/AddModal";
-import { selectAuthState } from "../../redux/authSlice";
 import EditModal from "./components/EditModal";
 
 const EPayment = {
@@ -56,6 +61,7 @@ function RentManagement() {
   });
   const { profile } = useSelector(selectAuthState);
   const [selectedRental, setSelectedRental] = useState(null);
+  const loaderRef = useRef(null);
 
   const fetchContracts = useCallback(() => {
     dispatch(getRentals({ pagination, filter }));
@@ -99,6 +105,33 @@ function RentManagement() {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleIntersection = (entries, observer) => {
+    const entry = entries[0];
+
+    // When the loaderRef element intersects the viewport, fetch more data
+    if (entry.isIntersecting && rentals.total > rentals.list.length) {
+      setPagination((prev) => ({ ...prev, size: prev.size + 10 }));
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleIntersection, {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0,
+    });
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [rentals]);
 
   return (
     <Fragment>
@@ -200,6 +233,11 @@ function RentManagement() {
                         </td>
                       </tr>
                     ))}
+                    <tr>
+                      <td colSpan={10}>
+                        <div ref={loaderRef} />
+                      </td>
+                    </tr>
                   </Fragment>
                 ) : (
                   <tr>
@@ -210,21 +248,6 @@ function RentManagement() {
                 )}
               </tbody>
             </table>
-
-            <div
-              className={`flex items-center justify-end w-full mt-4 ${
-                rentals.total === 0 ? "hidden" : "flex"
-              }`}
-            >
-              <Pagination
-                total={rentals.total}
-                page={pagination.page}
-                size={pagination.size}
-                onPageChange={(page) =>
-                  setPagination((prev) => ({ ...prev, page }))
-                }
-              />
-            </div>
           </div>
         </TitleCard>
       </div>

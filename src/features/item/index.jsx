@@ -1,12 +1,17 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import { PencilIcon } from "@heroicons/react/24/outline";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
+import { selectAuthState } from "../../redux/authSlice";
+import { getItems, selectItems } from "../../redux/itemSlice";
 import { setPageTitle } from "../common/headerSlice";
 import AddItem from "./component/AddItem";
-import { getItems, selectItems } from "../../redux/itemSlice";
-import Pagination from "../../components/pagination";
-import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { selectAuthState } from "../../redux/authSlice";
 import EditItem from "./component/EditItem";
 
 const TopSideButtons = ({ onOpenAddIncome }) => {
@@ -29,6 +34,7 @@ function ItemPage() {
   const [isOpenAddIncome, setOpenAddIncome] = useState(false);
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
   const [selectedItem, setSelectedItem] = useState(null);
+  const loaderRef = useRef(null);
 
   const onOpenAddIncome = () => setOpenAddIncome(true);
 
@@ -44,6 +50,33 @@ function ItemPage() {
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
+
+  const handleIntersection = (entries, observer) => {
+    const entry = entries[0];
+
+    // When the loaderRef element intersects the viewport, fetch more data
+    if (entry.isIntersecting && items.total > items.list.length) {
+      setPagination((prev) => ({ ...prev, size: prev.size + 10 }));
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleIntersection, {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0,
+    });
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [items]);
 
   return (
     <Fragment>
@@ -74,7 +107,7 @@ function ItemPage() {
                         <td className="text-base">{car.id}</td>
                         <td className="text-base">{car.name}</td>
 
-                        <td className=" flex justify-end gap-2">
+                        <td className="flex justify-end gap-2 ">
                           <button
                             className="btn btn-square btn-outline btn-sm btn-primary"
                             onClick={() => setSelectedItem(car)}
@@ -85,6 +118,11 @@ function ItemPage() {
                         </td>
                       </tr>
                     ))}
+                    <tr>
+                      <td colSpan={3}>
+                        <div ref={loaderRef} />
+                      </td>
+                    </tr>
                   </Fragment>
                 ) : (
                   <tr>
@@ -98,18 +136,7 @@ function ItemPage() {
           </div>
         </TitleCard>
       </div>
-      <div
-        className={`flex items-center justify-end w-full mt-4 ${
-          items.total === 0 ? "hidden" : "flex"
-        }`}
-      >
-        <Pagination
-          total={items.total}
-          page={pagination.page}
-          size={pagination.size}
-          onPageChange={(page) => setPagination((prev) => ({ ...prev, page }))}
-        />
-      </div>
+
       <AddItem
         open={isOpenAddIncome}
         onClose={() => setOpenAddIncome(false)}

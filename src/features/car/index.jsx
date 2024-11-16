@@ -1,21 +1,26 @@
+import { BanknotesIcon } from "@heroicons/react/24/outline";
 import Pencil from "@heroicons/react/24/outline/PencilIcon";
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
 import SearchBar from "../../components/Input/SearchBar";
-import { getCars, selectCarState } from "../../redux/carSlice";
-import { setPageTitle } from "../common/headerSlice";
-import AddModal from "./components/AddModal";
-import EditModal from "./components/EditModal";
-import Pagination from "../../components/pagination";
 import { selectAuthState } from "../../redux/authSlice";
+import { getCars, selectCarState } from "../../redux/carSlice";
 import { formatDateNoTime } from "../../utils/date";
-import { BanknotesIcon } from "@heroicons/react/24/outline";
-import { openModal } from "../common/modalSlice";
 import {
   CONFIRMATION_MODAL_CLOSE_TYPES,
   MODAL_BODY_TYPES,
 } from "../../utils/globalConstantUtil";
+import { setPageTitle } from "../common/headerSlice";
+import { openModal } from "../common/modalSlice";
+import AddModal from "./components/AddModal";
+import EditModal from "./components/EditModal";
 
 const TopSideButtons = ({ onOpenAddModal }) => {
   return (
@@ -38,6 +43,7 @@ function CarManagement() {
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
   const [selectedCar, setSelectedCar] = useState(null);
   const [filter, setFilter] = useState({ name: "", status: "" });
+  const loaderRef = useRef(null);
 
   const onOpenAddModal = () => setOpenAddModal(true);
 
@@ -112,6 +118,33 @@ function CarManagement() {
     );
   };
 
+  const handleIntersection = (entries, observer) => {
+    const entry = entries[0];
+
+    // When the loaderRef element intersects the viewport, fetch more data
+    if (entry.isIntersecting && cars.total > cars.list.length) {
+      setPagination((prev) => ({ ...prev, size: prev.size + 10 }));
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleIntersection, {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0,
+    });
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [cars]);
+
   return (
     <Fragment>
       <div>
@@ -147,7 +180,7 @@ function CarManagement() {
               Reset
             </button>
           </div>
-          <div className="w-full overflow-x-auto scroll-custom">
+          <div className="w-full overflow-auto scroll-custom max-h-96">
             <table className="table w-full">
               <thead>
                 <tr>
@@ -197,31 +230,21 @@ function CarManagement() {
                         </td>
                       </tr>
                     ))}
+                    <tr>
+                      <td colSpan={10}>
+                        <div ref={loaderRef} />
+                      </td>
+                    </tr>
                   </Fragment>
                 ) : (
                   <tr>
-                    <td colSpan={4} className="text-center">
+                    <td colSpan={10} className="text-center">
                       Data not found
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
-
-            <div
-              className={`flex items-center justify-end w-full mt-4 ${
-                cars.total === 0 ? "hidden" : "flex"
-              }`}
-            >
-              <Pagination
-                total={cars.total}
-                page={pagination.page}
-                size={pagination.size}
-                onPageChange={(page) =>
-                  setPagination((prev) => ({ ...prev, page }))
-                }
-              />
-            </div>
           </div>
         </TitleCard>
       </div>

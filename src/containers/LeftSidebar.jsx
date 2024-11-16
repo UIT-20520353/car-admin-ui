@@ -1,11 +1,10 @@
+import { TagIcon, UserIcon } from "@heroicons/react/24/outline";
 import XMarkIcon from "@heroicons/react/24/outline/XMarkIcon";
+import { useSelector } from "react-redux";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { selectAuthState } from "../redux/authSlice";
 import routes from "../routes/sidebar";
 import SidebarSubmenu from "./SidebarSubmenu";
-import { selectAuthState } from "../redux/authSlice";
-import { UserIcon, TagIcon } from "@heroicons/react/24/outline";
-import { useSelector } from "react-redux";
-import { ExclamationTriangleIcon } from "@heroicons/react/16/solid";
 
 function LeftSidebar() {
   const location = useLocation();
@@ -73,7 +72,7 @@ function LeftSidebar() {
                   `${isActive ? "font-semibold  bg-base-200 " : "font-normal"}`
                 }
               >
-                <TagIcon className="h-6 w-6" /> Item
+                <TagIcon className="w-6 h-6" /> Item
                 {location.pathname === "/item" ? (
                   <span
                     className="absolute inset-y-0 left-0 w-1 rounded-tr-md rounded-br-md bg-primary "
@@ -90,7 +89,7 @@ function LeftSidebar() {
                   `${isActive ? "font-semibold  bg-base-200 " : "font-normal"}`
                 }
               >
-                <UserIcon className="h-6 w-6" /> Staff
+                <UserIcon className="w-6 h-6" /> Staff
                 {location.pathname === "/staff" ? (
                   <span
                     className="absolute inset-y-0 left-0 w-1 rounded-tr-md rounded-br-md bg-primary "

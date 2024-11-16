@@ -1,11 +1,16 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
-import { setPageTitle } from "../common/headerSlice";
-import Pagination from "../../components/pagination";
 import { selectAuthState } from "../../redux/authSlice";
-import AddStaff from "./components/AddStaff";
 import { getStaffs, selectStaffState } from "../../redux/staffSlice";
+import { setPageTitle } from "../common/headerSlice";
+import AddStaff from "./components/AddStaff";
 
 const TopSideButtons = ({ onOpenAddIncome }) => {
   return (
@@ -26,7 +31,7 @@ function StaffPage() {
   const { staffs, updateResult } = useSelector(selectStaffState);
   const [isOpenAddIncome, setOpenAddIncome] = useState(false);
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
-  const [selectedItem, setSelectedItem] = useState(null);
+  const loaderRef = useRef(null);
 
   const onOpenAddIncome = () => setOpenAddIncome(true);
 
@@ -42,6 +47,33 @@ function StaffPage() {
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
+
+  const handleIntersection = (entries, observer) => {
+    const entry = entries[0];
+
+    // When the loaderRef element intersects the viewport, fetch more data
+    if (entry.isIntersecting && staffs.total > staffs.list.length) {
+      setPagination((prev) => ({ ...prev, size: prev.size + 10 }));
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleIntersection, {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0,
+    });
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [staffs]);
 
   return (
     <Fragment>
@@ -76,6 +108,11 @@ function StaffPage() {
                         <td className="text-base">{car.role}</td>
                       </tr>
                     ))}
+                    <tr>
+                      <td colSpan={4}>
+                        <div ref={loaderRef} />
+                      </td>
+                    </tr>
                   </Fragment>
                 ) : (
                   <tr>
@@ -89,18 +126,7 @@ function StaffPage() {
           </div>
         </TitleCard>
       </div>
-      <div
-        className={`flex items-center justify-end w-full mt-4 ${
-          staffs.total === 0 ? "hidden" : "flex"
-        }`}
-      >
-        <Pagination
-          total={staffs.total}
-          page={pagination.page}
-          size={pagination.size}
-          onPageChange={(page) => setPagination((prev) => ({ ...prev, page }))}
-        />
-      </div>
+
       <AddStaff
         open={isOpenAddIncome}
         onClose={() => setOpenAddIncome(false)}

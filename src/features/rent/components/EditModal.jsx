@@ -8,7 +8,6 @@ import * as yup from "yup";
 import { EToastType, showToast } from "../../../app/toast";
 import ErrorText from "../../../components/Typography/ErrorText";
 import { selectCarState } from "../../../redux/carSlice";
-import { selectConstractState } from "../../../redux/contractSlice";
 import {
   editRental,
   resetEditRentalResult,
@@ -19,13 +18,13 @@ dayjs.extend(isSameOrAfter);
 
 const EditModal = ({ rental, size, onClose, refresh }) => {
   const { cars } = useSelector(selectCarState);
-  const { contracts } = useSelector(selectConstractState);
   const { editRentalResult } = useSelector(selectRentalState);
 
   const [selectCar, setSelectCar] = useState(null);
   const [step, setStep] = useState(1);
   const [carName, setCarname] = useState("");
   const [endDate, setEndDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [selectedContract, setSelectedContract] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -70,7 +69,6 @@ const EditModal = ({ rental, size, onClose, refresh }) => {
     feeType: yup.string().required("Fee type is required"),
     status: yup.string().required("Status is required"),
     note: yup.string(),
-    contractId: yup.string().required("Contract is required"),
   });
 
   const {
@@ -102,16 +100,6 @@ const EditModal = ({ rental, size, onClose, refresh }) => {
     const name = carName.toLowerCase();
     return cars.list.filter((car) => car.name.toLowerCase().includes(name));
   }, [cars, carName]);
-
-  const filteredContracts = useMemo(() => {
-    if (selectCar) {
-      return contracts.list.filter(
-        (contract) => contract.car.id === selectCar.id
-      );
-    }
-
-    return [];
-  }, [selectCar, contracts]);
 
   const handleClose = () => {
     onClose();
@@ -151,7 +139,6 @@ const EditModal = ({ rental, size, onClose, refresh }) => {
     errors?.amount?.message ||
     errors?.payment?.message ||
     errors?.feeType?.message ||
-    errors?.contractId?.message ||
     "";
 
   useEffect(() => {
@@ -184,9 +171,9 @@ const EditModal = ({ rental, size, onClose, refresh }) => {
         payment: rental.payment,
         feeType: rental.feeType,
         note: rental.note,
-        contractId: rental.contract.id,
         status: rental.status,
       });
+      setSelectedContract(rental.contract);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rental]);
@@ -250,23 +237,21 @@ const EditModal = ({ rental, size, onClose, refresh }) => {
             <div className="grid w-full grid-cols-2 gap-3">
               <div className="flex flex-col items-start w-full gap-1">
                 <label className="ml-3 text-base font-medium">Contract</label>
-                <select
-                  className="w-full select select-bordered"
-                  {...register("contractId")}
-                >
-                  {filteredContracts.map((contract) => (
-                    <option
-                      key={`contract-option-${contract.id}`}
-                      value={contract.id}
-                    >
-                      <p className="break-all whitespace-pre">{`${
-                        contract.customerName
-                      } - ${dayjs(contract.startDate).format(
-                        "DD/MM/YYYY"
-                      )} - ${dayjs(contract.endDate).format("DD/MM/YYYY")}`}</p>
-                    </option>
-                  ))}
-                </select>
+                <input
+                  type="text"
+                  className="w-full input input-bordered"
+                  placeholder="Contract"
+                  value={
+                    selectedContract
+                      ? `${selectedContract.customerName} - ${dayjs(
+                          selectedContract.startDate
+                        ).format("DD/MM/YYYY")} - ${dayjs(
+                          selectedContract.endDate
+                        ).format("DD/MM/YYYY")}`
+                      : ""
+                  }
+                  disabled
+                />
               </div>
 
               <div className="flex flex-col items-start w-full gap-1">

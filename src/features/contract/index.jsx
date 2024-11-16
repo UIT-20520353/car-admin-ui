@@ -1,8 +1,17 @@
+import ArrowPathRoundedSquareIcon from "@heroicons/react/24/outline/ArrowPathRoundedSquareIcon";
 import Pencil from "@heroicons/react/24/outline/PencilIcon";
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import * as dayjs from "dayjs";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
 import SearchBar from "../../components/Input/SearchBar";
+import { selectAuthState } from "../../redux/authSlice";
 import { getCars } from "../../redux/carSlice";
 import {
   getContracts,
@@ -11,12 +20,10 @@ import {
 } from "../../redux/contractSlice";
 import { setPageTitle } from "../common/headerSlice";
 import AddModal from "./components/AddModal";
-import { selectAuthState } from "../../redux/authSlice";
-import * as dayjs from "dayjs";
-import Pagination from "../../components/pagination";
 import EditModal from "./components/EditModal";
-import ArrowPathRoundedSquareIcon from "@heroicons/react/24/outline/ArrowPathRoundedSquareIcon";
 import RenewModal from "./components/RenewModal";
+import NoSymbolIcon from "@heroicons/react/24/outline/NoSymbolIcon";
+import EndModal from "./components/EndModal";
 
 const TopSideButtons = ({ onOpenAddModal }) => {
   return (
@@ -47,6 +54,8 @@ function ContractPage() {
   const [filter, setFilter] = useState({ carId: "", status: "" });
   const [selectedContract, setSelectedContract] = useState(null);
   const [renewContract, setRenewContract] = useState(null);
+  const [selectedContactToEnd, setSelectedContractToEnd] = useState(null);
+  const loaderRef = useRef(null);
 
   const onOpenAddModal = () => setOpenAddModal(true);
 
@@ -92,6 +101,33 @@ function ContractPage() {
     dispatch(getCars({ pagination: { page: 0, size: 9999 }, filter: {} }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleIntersection = (entries, observer) => {
+    const entry = entries[0];
+
+    // When the loaderRef element intersects the viewport, fetch more data
+    if (entry.isIntersecting && contracts.total > contracts.list.length) {
+      setPagination((prev) => ({ ...prev, size: prev.size + 10 }));
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleIntersection, {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0,
+    });
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [contracts]);
 
   return (
     <Fragment>
@@ -187,9 +223,21 @@ function ContractPage() {
                               height={20}
                             />
                           </button>
+                          <button
+                            className={`btn btn-square btn-outline btn-sm btn-error`}
+                            disabled={contract.status === "END"}
+                            onClick={() => setSelectedContractToEnd(contract)}
+                          >
+                            <NoSymbolIcon width={20} height={20} />
+                          </button>
                         </td>
                       </tr>
                     ))}
+                    <tr>
+                      <td colSpan={6}>
+                        <div ref={loaderRef} />
+                      </td>
+                    </tr>
                   </Fragment>
                 ) : (
                   <tr>
@@ -200,20 +248,6 @@ function ContractPage() {
                 )}
               </tbody>
             </table>
-            <div
-              className={`flex items-center justify-end w-full mt-4 ${
-                contracts.total === 0 ? "hidden" : "flex"
-              }`}
-            >
-              <Pagination
-                total={contracts.total}
-                page={pagination.page}
-                size={pagination.size}
-                onPageChange={(page) =>
-                  setPagination((prev) => ({ ...prev, page }))
-                }
-              />
-            </div>
           </div>
         </TitleCard>
       </div>
@@ -233,6 +267,12 @@ function ContractPage() {
       <RenewModal
         selectedContract={renewContract}
         onClose={() => setRenewContract(null)}
+        size="lg"
+        refresh={() => setPagination({ page: 0, size: 10 })}
+      />
+      <EndModal
+        selectedContract={selectedContactToEnd}
+        onClose={() => setSelectedContractToEnd(null)}
         size="lg"
         refresh={() => setPagination({ page: 0, size: 10 })}
       />

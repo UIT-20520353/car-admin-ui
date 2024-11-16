@@ -29,7 +29,7 @@ export const getRentals = createAsyncThunk(
 
 export const addRental = createAsyncThunk(
   "/rentals/addRental",
-  async ({ data }, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     const accessToken = localStorage.getItem(appConstant.TOKEN_KEY);
     try {
       const response = await api.post(
