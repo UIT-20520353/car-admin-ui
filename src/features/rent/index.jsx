@@ -121,29 +121,6 @@ function RentManagement() {
               />
             </div>
             <div className="flex flex-col w-1/3">
-              <span className="text-base font-medium">Contract ID</span>
-              <SearchBar
-                searchText={filter.contractId}
-                styleClass="w-full"
-                setSearchText={(contractId) =>
-                  setFilter((prev) => ({ ...prev, contractId }))
-                }
-                placeholderText="Search by car ID"
-              />
-            </div>
-
-            <button
-              className="w-32 btn btn-primary btn-sm"
-              onClick={() => setPagination({ page: 0, size: 10 })}
-            >
-              Search
-            </button>
-            <button className="w-32 btn btn-outline btn-sm" onClick={onReset}>
-              Reset
-            </button>
-          </div>
-          <div className="flex items-end w-full gap-3 mb-6">
-            <div className="flex flex-col w-1/3">
               <span className="text-base font-medium">Rental status</span>
               <select
                 className="w-full select select-bordered select-sm"
@@ -160,25 +137,18 @@ function RentManagement() {
                 <option value="INDUE">Indue</option>
               </select>
             </div>
-            <div className="flex flex-col w-1/3">
-              <span className="text-base font-medium">Payment</span>
-              <select
-                className="w-full select select-bordered select-sm"
-                value={filter.paymentType}
-                onChange={(e) =>
-                  setFilter((prev) => ({
-                    ...prev,
-                    paymentType: e.target.value,
-                  }))
-                }
-              >
-                <option value="">All</option>
-                <option value="CASH">Cash</option>
-                <option value="BANK">Bank</option>
-                <option value="SQUARE">Square</option>
-              </select>
-            </div>
+
+            <button
+              className="w-32 btn btn-primary btn-sm"
+              onClick={() => setPagination({ page: 0, size: 10 })}
+            >
+              Search
+            </button>
+            <button className="w-32 btn btn-outline btn-sm" onClick={onReset}>
+              Reset
+            </button>
           </div>
+
           <div className="w-full overflow-x-auto scroll-custom">
             <table className="table w-full">
               <thead>

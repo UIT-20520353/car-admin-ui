@@ -10,10 +10,36 @@ import {
   resetEditCarResult,
   selectCarState,
 } from "../../../redux/carSlice";
+import dayjs from "dayjs";
 
 const validationSchema = yup.object({
   name: yup.string().required("Please enter car name!"),
   registrationPlate: yup.string().required("Please enter registration plate!"),
+  buyingPrice: yup
+    .string()
+    .matches(/^\d*[1-9]\d*$/, "Invalid amount")
+    .required("Please input amount !"),
+  rego: yup
+    .string()
+    .matches(/^\d*[1-9]\d*$/, "Invalid amount")
+    .required("Please input amount !"),
+  carPlay: yup
+    .string()
+    .matches(/^\d*[1-9]\d*$/, "Invalid amount")
+    .required("Please input amount !"),
+  keys: yup
+    .string()
+    .matches(/^\d*[1-9]\d*$/, "Invalid amount")
+    .required("Please input amount !"),
+  gps: yup
+    .string()
+    .matches(/^\d*[1-9]\d*$/, "Invalid amount")
+    .required("Please input amount !"),
+  note: yup.string(),
+  buyingDate: yup
+    .date()
+    .required("Start date is required")
+    .typeError("Invalid date format"),
 });
 
 const EditModal = ({ size, onClose, refresh, car }) => {
@@ -31,6 +57,13 @@ const EditModal = ({ size, onClose, refresh, car }) => {
     defaultValues: {
       name: "",
       registrationPlate: "",
+      buyingDate: dayjs().format("YYYY-MM-DD"),
+      buyingPrice: "",
+      rego: "",
+      keys: "",
+      gps: "",
+      note: "",
+      carPlay: "",
     },
   });
 
@@ -52,6 +85,13 @@ const EditModal = ({ size, onClose, refresh, car }) => {
   const onResetClick = () => {
     setValue("name", car.name);
     setValue("registrationPlate", car.registrationPlate);
+    setValue("buyingDate", car.buyingDate);
+    setValue("buyingPrice", car.buyingPrice);
+    setValue("carPlay", car.carPlay);
+    setValue("keys", car.keys);
+    setValue("note", car.note);
+    setValue("rego", car.rego);
+    setValue("gps", car.gps);
   };
 
   useEffect(() => {
@@ -73,6 +113,13 @@ const EditModal = ({ size, onClose, refresh, car }) => {
     if (car) {
       setValue("name", car.name);
       setValue("registrationPlate", car.registrationPlate);
+      setValue("buyingDate", car.buyingDate);
+      setValue("buyingPrice", car.buyingPrice);
+      setValue("carPlay", car.carPlay);
+      setValue("keys", car.keys);
+      setValue("note", car.note);
+      setValue("rego", car.rego);
+      setValue("gps", car.gps);
     } else {
       reset();
     }
@@ -115,10 +162,80 @@ const EditModal = ({ size, onClose, refresh, car }) => {
                 {...register("registrationPlate")}
               />
             </div>
+            <div className="flex flex-col items-start w-full gap-1">
+              <label className="ml-3 text-base font-medium">Buying Date</label>
+              <input
+                type="date"
+                className="w-full input input-bordered"
+                placeholder="Select date"
+                {...register("buyingDate")}
+              />
+            </div>
+            <div className="flex flex-col items-start w-full gap-1">
+              <label className="ml-3 text-base font-medium">Buying Price</label>
+              <input
+                type="text"
+                className="w-full input input-bordered"
+                placeholder="Enter buying price"
+                {...register("buyingPrice")}
+              />
+            </div>
+            <div className="flex flex-col items-start w-full gap-1">
+              <label className="ml-3 text-base font-medium">Rego</label>
+              <input
+                type="text"
+                className="w-full input input-bordered"
+                placeholder="Enter rego"
+                {...register("rego")}
+              />
+            </div>
+            <div className="flex flex-col items-start w-full gap-1">
+              <label className="ml-3 text-base font-medium">Car Play</label>
+              <input
+                type="text"
+                className="w-full input input-bordered"
+                placeholder="Enter car play"
+                {...register("carPlay")}
+              />
+            </div>
+            <div className="flex flex-col items-start w-full gap-1">
+              <label className="ml-3 text-base font-medium">Keys</label>
+              <input
+                type="text"
+                className="w-full input input-bordered"
+                placeholder="Enter keys"
+                {...register("keys")}
+              />
+            </div>
+            <div className="flex flex-col items-start w-full gap-1">
+              <label className="ml-3 text-base font-medium">GPS</label>
+              <input
+                type="text"
+                className="w-full input input-bordered"
+                placeholder="Enter gps"
+                {...register("gps")}
+              />
+            </div>
+            <div className="flex flex-col items-start w-full gap-1">
+              <label className="ml-3 text-base font-medium">Note</label>
+              <textarea
+                placeholder="Enter note"
+                className="w-full resize-none textarea textarea-bordered"
+                rows={5}
+                {...register("note")}
+              />
+            </div>
           </div>
 
           <ErrorText styleClass="my-4">
-            {errors?.name?.message || errors?.registrationPlate?.message}
+            {errors?.name?.message ||
+              errors?.registrationPlate?.message ||
+              errors?.buyingDate?.message ||
+              errors?.buyingPrice?.message ||
+              errors?.carPlay?.message ||
+              errors?.gps?.message ||
+              errors?.keys?.message ||
+              errors?.rego?.message}
           </ErrorText>
 
           <div className="flex items-center justify-center w-full gap-4 mt-5">

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import appConstant, { errors } from "../app/constant";
 import api from "../app/http";
+import uniqId from "../utils/uniqId";
 
 export const getCars = createAsyncThunk(
   "/cars/getCars",
@@ -61,6 +62,24 @@ export const editCar = createAsyncThunk(
   }
 );
 
+export const soldCar = createAsyncThunk(
+  "cars/soldCar",
+  async ({ id }, { rejectWithValue }) => {
+    const accessToken = localStorage.getItem(appConstant.TOKEN_KEY);
+    try {
+      const response = await api.post(`/api/car/sold/${id}`, null, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const carSlice = createSlice({
   name: "cars",
   initialState: {
@@ -70,6 +89,7 @@ export const carSlice = createSlice({
     },
     addCarResult: null,
     editCarResult: null,
+    soldCarResult: null,
   },
   reducers: {
     resetAddCarResult: (state) => {
@@ -77,6 +97,9 @@ export const carSlice = createSlice({
     },
     resetEditCarResult: (state) => {
       state.editCarResult = null;
+    },
+    resetSoldCarResult: (state) => {
+      state.soldCarResult = null;
     },
   },
   extraReducers: {
@@ -101,10 +124,17 @@ export const carSlice = createSlice({
     [editCar.rejected]: (state, action) => {
       state.editCarResult = errors[action.payload.detail] || "Xảy ra lỗi!";
     },
+    [soldCar.fulfilled]: (state) => {
+      state.soldCarResult = uniqId();
+    },
+    [soldCar.rejected]: (state, action) => {
+      state.soldCarResult = errors[action.payload.detail] || "Xảy ra lỗi!";
+    },
   },
 });
 
-export const { resetAddCarResult, resetEditCarResult } = carSlice.actions;
+export const { resetAddCarResult, resetEditCarResult, resetSoldCarResult } =
+  carSlice.actions;
 export const selectCarState = (state) => state.car;
 
 export default carSlice.reducer;

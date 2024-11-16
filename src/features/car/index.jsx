@@ -9,6 +9,13 @@ import AddModal from "./components/AddModal";
 import EditModal from "./components/EditModal";
 import Pagination from "../../components/pagination";
 import { selectAuthState } from "../../redux/authSlice";
+import { formatDateNoTime } from "../../utils/date";
+import { BanknotesIcon } from "@heroicons/react/24/outline";
+import { openModal } from "../common/modalSlice";
+import {
+  CONFIRMATION_MODAL_CLOSE_TYPES,
+  MODAL_BODY_TYPES,
+} from "../../utils/globalConstantUtil";
 
 const TopSideButtons = ({ onOpenAddModal }) => {
   return (
@@ -25,7 +32,7 @@ const TopSideButtons = ({ onOpenAddModal }) => {
 
 function CarManagement() {
   const dispatch = useDispatch();
-  const { cars } = useSelector(selectCarState);
+  const { cars, soldCarResult } = useSelector(selectCarState);
   const { profile } = useSelector(selectAuthState);
   const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
@@ -57,6 +64,21 @@ function CarManagement() {
     }
   };
 
+  const renderSold = (car) => {
+    if (car.isSold) {
+      return (
+        <div className="flex items-center justify-center p-3 text-base text-white badge badge-error">
+          SOLD
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-center justify-center p-3 text-base text-white badge badge-success">
+        NONE
+      </div>
+    );
+  };
+
   const onReset = () => {
     setPagination({ page: 0, size: 10 });
     setFilter({ name: "" });
@@ -65,7 +87,7 @@ function CarManagement() {
   const fetchCars = useCallback(() => {
     dispatch(getCars({ pagination, filter }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination]);
+  }, [pagination, soldCarResult]);
 
   useEffect(() => {
     dispatch(setPageTitle({ title: "Car Management" }));
@@ -75,6 +97,20 @@ function CarManagement() {
   useEffect(() => {
     fetchCars();
   }, [fetchCars]);
+
+  const onSoldCar = (car) => {
+    dispatch(
+      openModal({
+        title: "Sold Car",
+        bodyType: MODAL_BODY_TYPES.CONFIRMATION,
+        extraObject: {
+          message: `Are you sure you want to sold this car: ${car.name}?`,
+          type: CONFIRMATION_MODAL_CLOSE_TYPES.LEAD_DELETE,
+          index: car.id,
+        },
+      })
+    );
+  };
 
   return (
     <Fragment>
@@ -115,11 +151,16 @@ function CarManagement() {
             <table className="table w-full">
               <thead>
                 <tr>
-                  <th>Car ID</th>
-                  <th>Name</th>
                   <th>Registration plate</th>
+                  <th>Name</th>
+                  <th>Is Sold</th>
+                  <th>Buying Date</th>
+                  <th>Buying Price</th>
+                  <th>Car Play</th>
+                  <th>GPS</th>
+                  <th>Rego</th>
                   <th>Status</th>
-                  <th></th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -127,18 +168,31 @@ function CarManagement() {
                   <Fragment>
                     {cars.list.map((car) => (
                       <tr key={`car-${car.id}`}>
-                        <td className="text-base">{car.id}</td>
-                        <td className="text-base">{car.name}</td>
                         <td className="text-base">{car.registrationPlate}</td>
+                        <td className="text-base">{car.name}</td>
+                        <td className="text-base">{renderSold(car)}</td>
+                        <td className="text-base">
+                          {formatDateNoTime(car.buyingDate)}
+                        </td>
+                        <td className="text-base">{car.buyingPrice}</td>
+                        <td className="text-base">{car.carPlay}</td>
+                        <td className="text-base">{car.gps}</td>
+                        <td className="text-base">{car.rego}</td>
                         <td>{renderStatus(car)}</td>
-                        <td>
+                        <td className="flex gap-2">
                           <button
-                            className={`btn btn-square btn-outline btn-sm btn-primary ${
-                              profile?.role !== "ADMIN" && "hidden"
-                            }`}
+                            className={`btn btn-square btn-outline btn-sm btn-primary `}
+                            disabled={profile?.role !== "ADMIN" || car.isSold}
                             onClick={() => setSelectedCar(car)}
                           >
                             <Pencil width={20} height={20} />
+                          </button>
+                          <button
+                            className={`btn btn-square btn-outline btn-sm btn-danger `}
+                            disabled={profile?.role !== "ADMIN" || car.isSold}
+                            onClick={() => onSoldCar(car)}
+                          >
+                            <BanknotesIcon width={20} height={20} />
                           </button>
                         </td>
                       </tr>

@@ -29,11 +29,6 @@ const routes = [
     icon: <ArrowTrendingUpIcon className={iconClasses} />,
     name: "Income & Outcome",
   },
-  {
-    path: "/item",
-    icon: <TagIcon className={iconClasses} />,
-    name: "Item",
-  },
   // {
   //   path: "/staff",
   //   icon: <UserIcon className={iconClasses} />,
