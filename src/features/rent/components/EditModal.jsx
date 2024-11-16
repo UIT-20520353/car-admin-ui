@@ -17,49 +17,6 @@ import {
 
 dayjs.extend(isSameOrAfter);
 
-const minDate = dayjs().startOf("day");
-
-const validationSchema = yup.object({
-  date: yup
-    .date()
-    .required("Date is required")
-    .typeError("Invalid date format")
-    .test("min-date", "Date cannot be in the past", (value) => {
-      return value && dayjs(value).isSameOrAfter(minDate, "day");
-    })
-    .max(
-      new Date(new Date().setDate(new Date().getDate() + 3)),
-      "Date cannot be more than 3 days in the future"
-    ),
-  startDate: yup
-    .date()
-    .required("Start date is required")
-    .typeError("Invalid date format"),
-  lateDays: yup
-    .number()
-    .required("Late days is required")
-    .typeError("Late days must be a number")
-    .min(0, "Late days must be greater than or equal 0"),
-  duration: yup
-    .number()
-    .required("Duration is required")
-    .typeError("Duration must be a number")
-    .integer("Must be an integer")
-    .min(1, "Duration must be greater than or equal 1"),
-  amount: yup
-    .number()
-    .required("Duration is required")
-    .typeError("Duration must be a number")
-    .test("min-amount", "Amount must be greater than 0", (value) => {
-      return value && Number(value) > 0;
-    }),
-  payment: yup.string().required("Payment method is required"),
-  feeType: yup.string().required("Fee type is required"),
-  status: yup.string().required("Status is required"),
-  note: yup.string(),
-  contractId: yup.string().required("Contract is required"),
-});
-
 const EditModal = ({ rental, size, onClose, refresh }) => {
   const { cars } = useSelector(selectCarState);
   const { contracts } = useSelector(selectConstractState);
@@ -71,6 +28,51 @@ const EditModal = ({ rental, size, onClose, refresh }) => {
   const [endDate, setEndDate] = useState(dayjs().format("YYYY-MM-DD"));
 
   const dispatch = useDispatch();
+
+  const validationSchema = yup.object({
+    date: yup
+      .date()
+      .required("Date is required")
+      .typeError("Invalid date format")
+      .test("min-date", "Date cannot be in the past", (value) => {
+        return (
+          value &&
+          dayjs(value).isSameOrAfter(dayjs(rental.date).startOf("day"), "day")
+        );
+      })
+      .max(
+        new Date(new Date().setDate(new Date().getDate() + 3)),
+        "Date cannot be more than 3 days in the future"
+      ),
+    startDate: yup
+      .date()
+      .required("Start date is required")
+      .typeError("Invalid date format"),
+    lateDays: yup
+      .number()
+      .required("Late days is required")
+      .typeError("Late days must be a number")
+      .min(0, "Late days must be greater than or equal 0"),
+    duration: yup
+      .number()
+      .required("Duration is required")
+      .typeError("Duration must be a number")
+      .integer("Must be an integer")
+      .min(1, "Duration must be greater than or equal 1"),
+    amount: yup
+      .number()
+      .required("Duration is required")
+      .typeError("Duration must be a number")
+      .test("min-amount", "Amount must be greater than 0", (value) => {
+        return value && Number(value) > 0;
+      }),
+    payment: yup.string().required("Payment method is required"),
+    feeType: yup.string().required("Fee type is required"),
+    status: yup.string().required("Status is required"),
+    note: yup.string(),
+    contractId: yup.string().required("Contract is required"),
+  });
+
   const {
     handleSubmit,
     register,

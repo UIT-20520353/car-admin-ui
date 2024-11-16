@@ -19,48 +19,6 @@ dayjs.extend(isSameOrAfter);
 
 const minDate = dayjs().startOf("day");
 
-const validationSchema = yup.object({
-  customerEmail: yup
-    .string()
-    .required("Please enter your email!")
-    .matches(
-      /^[a-zA-Z0-9_\\.-]+@[a-zA-Z0-9.]+\.[a-zA-Z]{2,4}?$/,
-      "Email is not in the correct format!"
-    ),
-  customerName: yup.string().required("Please enter customer name!"),
-  customerPhone: yup
-    .string()
-    .required("Please enter customer phone!")
-    .matches(
-      /^\+?[1-9]\d{1,14}$/,
-      "Phone number is not in the correct format!"
-    ),
-  note: yup.string(),
-  date: yup
-    .date()
-    .required("Date is required")
-    .typeError("Invalid date format")
-    .test("min-date", "Date cannot be in the past", (value) => {
-      return value && dayjs(value).isSameOrAfter(minDate, "day");
-    })
-    .max(
-      new Date(new Date().setDate(new Date().getDate() + 3)),
-      "Date cannot be more than 3 days in the future"
-    ),
-  startDate: yup
-    .date()
-    .required("Start date is required")
-    .typeError("Invalid date format")
-    .test("min-start-date", "Start date cannot be in the past", (value) => {
-      return value && dayjs(value).isSameOrAfter(minDate, "day");
-    }),
-  duration: yup
-    .number()
-    .required("Duration is required")
-    .typeError("Duration must be a number")
-    .min(0, "Duration must be greater than 0"),
-});
-
 const RenewModal = ({ selectedContract, size, onClose, refresh }) => {
   const dispatch = useDispatch();
   const { cars } = useSelector(selectCarState);
@@ -69,6 +27,54 @@ const RenewModal = ({ selectedContract, size, onClose, refresh }) => {
   const [step, setStep] = useState(1);
   const [carName, setCarname] = useState("");
   const [endDate, setEndDate] = useState(dayjs().format("YYYY-MM-DD"));
+
+  const validationSchema = yup.object({
+    customerEmail: yup
+      .string()
+      .required("Please enter your email!")
+      .matches(
+        /^[a-zA-Z0-9_\\.-]+@[a-zA-Z0-9.]+\.[a-zA-Z]{2,4}?$/,
+        "Email is not in the correct format!"
+      ),
+    customerName: yup.string().required("Please enter customer name!"),
+    customerPhone: yup
+      .string()
+      .required("Please enter customer phone!")
+      .matches(
+        /^\+?[1-9]\d{1,14}$/,
+        "Phone number is not in the correct format!"
+      ),
+    note: yup.string(),
+    date: yup
+      .date()
+      .required("Date is required")
+      .typeError("Invalid date format")
+      .test("min-date", "Date cannot be in the past", (value) => {
+        return value && dayjs(value).isSameOrAfter(minDate, "day");
+      })
+      .max(
+        new Date(new Date().setDate(new Date().getDate() + 3)),
+        "Date cannot be more than 3 days in the future"
+      ),
+    startDate: yup
+      .date()
+      .required("Start date is required")
+      .typeError("Invalid date format")
+      .test("min-start-date", "Start date cannot be in the past", (value) => {
+        return (
+          value &&
+          dayjs(value).isSameOrAfter(
+            dayjs(selectedContract.date).startOf("day"),
+            "day"
+          )
+        );
+      }),
+    duration: yup
+      .number()
+      .required("Duration is required")
+      .typeError("Duration must be a number")
+      .min(0, "Duration must be greater than 0"),
+  });
 
   const {
     handleSubmit,

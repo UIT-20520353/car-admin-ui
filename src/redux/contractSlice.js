@@ -25,6 +25,23 @@ export const getContracts = createAsyncThunk(
   }
 );
 
+export const getContractsByCar = createAsyncThunk(
+  "/contracts/getContractsByCar",
+  async () => {
+    const accessToken = localStorage.getItem(appConstant.TOKEN_KEY);
+    const response = await api.get("/api/contract/getByCar", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return {
+      list: response.data,
+      total: response.data.length,
+    };
+  }
+);
+
 export const addContract = createAsyncThunk(
   "/contracts/addContract",
   async ({ data, car }, { rejectWithValue }) => {
@@ -117,6 +134,15 @@ export const contractSlice = createSlice({
       state.contracts = action.payload;
     },
     [getContracts.rejected]: (state) => {
+      state.contracts = {
+        list: [],
+        total: 0,
+      };
+    },
+    [getContractsByCar.fulfilled]: (state, action) => {
+      state.contracts = action.payload;
+    },
+    [getContractsByCar.rejected]: (state) => {
       state.contracts = {
         list: [],
         total: 0,

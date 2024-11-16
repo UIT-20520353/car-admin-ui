@@ -10,6 +10,7 @@ import itemSlice from "../redux/itemSlice";
 import staffSlice from "../redux/staffSlice";
 import inoutSlice from "../redux/inoutSlice";
 import rentalSlice from "../redux/rentalSlice";
+import logSlice from "../redux/logSlice";
 
 const combinedReducer = {
   header: headerSlice,
@@ -23,6 +24,7 @@ const combinedReducer = {
   staffs: staffSlice,
   inout: inoutSlice,
   rental: rentalSlice,
+  logs: logSlice,
 };
 
 export default configureStore({
