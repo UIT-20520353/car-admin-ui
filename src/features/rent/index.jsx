@@ -61,7 +61,7 @@ function RentManagement() {
   const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
   const [filter, setFilter] = useState({
-    carId: "",
+    registrationPlate: "",
     contractId: "",
     paymentType: "",
     rentalStatus: "",
@@ -80,7 +80,12 @@ function RentManagement() {
 
   const onReset = () => {
     setPagination({ page: 0, size: 10 });
-    setFilter({ carId: "", contractId: "", paymentType: "", rentalStatus: "" });
+    setFilter({
+      registrationPlate: "",
+      contractId: "",
+      paymentType: "",
+      rentalStatus: "",
+    });
   };
 
   const isShowEditButton = (rental) => {
@@ -165,12 +170,12 @@ function RentManagement() {
         >
           <div className="flex items-end w-full gap-3 mb-6">
             <div className="flex flex-col w-1/3">
-              <span className="text-base font-medium">Car ID</span>
+              <span className="text-base font-medium">Registration plate</span>
               <SearchBar
-                searchText={filter.carId}
+                searchText={filter.registrationPlate}
                 styleClass="w-full"
-                setSearchText={(carId) =>
-                  setFilter((prev) => ({ ...prev, carId }))
+                setSearchText={(registrationPlate) =>
+                  setFilter((prev) => ({ ...prev, registrationPlate }))
                 }
                 placeholderText="Search by car ID"
               />
@@ -208,7 +213,7 @@ function RentManagement() {
             <table className="table w-full">
               <thead>
                 <tr>
-                  <th>Car ID</th>
+                  <th>Registion Plate</th>
                   <th>Contract ID</th>
                   <th>Date</th>
                   <th>Start date</th>
@@ -226,7 +231,7 @@ function RentManagement() {
                   <Fragment>
                     {rentals.list.map((rental) => (
                       <tr key={`rental-${rental.id}`}>
-                        <td>#{rental.contract.car.id}</td>
+                        <td>{rental.contract.car.registrationPlate}</td>
                         <td>#{rental.contract.id}</td>
                         <td>{dayjs(rental.date).format("DD/MM/YYYY")}</td>
                         <td>{dayjs(rental.startDate).format("DD/MM/YYYY")}</td>

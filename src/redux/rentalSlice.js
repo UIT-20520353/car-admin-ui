@@ -14,7 +14,7 @@ export const getRentals = createAsyncThunk(
       params: {
         page: pagination.page,
         size: pagination.size,
-        "carId.equals": filter.carId || null,
+        "registrationPlate.equals": filter.registrationPlate || null,
         "contractId.equals": filter.contractId || null,
         "rentalStatus.equals": filter.rentalStatus || null,
         "paymentType.equals": filter.paymentType || null,
