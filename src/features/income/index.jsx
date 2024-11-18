@@ -115,6 +115,51 @@ function IncomeOutcomePage() {
           TopSideButtons={<TopSideButtons onOpenAddIncome={onOpenAddIncome} />}
         >
           <div className="w-full overflow-x-auto scroll-custom max-h-[500px] overflow-y-auto">
+            {pnl && (
+              <div className="flex items-end w-full">
+                <div className="flex items-center justify-center h-10 px-8 text-white bg-blue-500 border border-transparent">
+                  Total
+                </div>
+                <div className="flex flex-col items-start flex-1 justify-stretch">
+                  <span className="text-xs font-medium">Income By Cash</span>
+                  <div className="flex items-center justify-between w-full h-10 px-2 text-black bg-white border border-l-0 border-gray-600">
+                    <span>$</span>
+                    <span>{pnl.totalInCash}</span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-start flex-1 justify-stretch">
+                  <span className="text-xs font-medium">Income By Bank</span>
+                  <div className="flex items-center justify-between w-full h-10 px-2 text-black bg-white border border-l-0 border-gray-600">
+                    <span>$</span>
+                    <span>{pnl.totalInBank}</span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-start flex-1 justify-stretch">
+                  <span className="text-xs font-medium">Outcome By Cash</span>
+                  <div className="flex items-center justify-between w-full h-10 px-2 text-black bg-white border border-l-0 border-gray-600">
+                    <span>$</span>
+                    <span>{pnl.totalOutCash}</span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-start flex-1 justify-stretch">
+                  <span className="text-xs font-medium">Outcome By Bank</span>
+                  <div className="flex items-center justify-between w-full h-10 px-2 text-black bg-white border border-l-0 border-gray-600">
+                    <span>$</span>
+                    <span>{pnl.totalOutBank}</span>
+                  </div>
+                </div>
+                <div className="border border-transparent flex items-center justify-between flex-[2_2_0%] h-10 px-2 text-white bg-blue-500">
+                  <span>$</span>
+                  <span>
+                    {Number(pnl.totalInCash) +
+                      Number(pnl.totalInBank) -
+                      Number(pnl.totalOutCash) -
+                      Number(pnl.totalOutBank)}
+                  </span>
+                </div>
+              </div>
+            )}
+
             <table className="table w-full">
               <thead>
                 <tr>
@@ -178,32 +223,6 @@ function IncomeOutcomePage() {
               </tbody>
             </table>
           </div>
-          {pnl && (
-            <div className="flex flex-col items-end">
-              <div className="flex justify-between w-[500px] font-bold">
-                <p>Income By Cash:</p> <p>{pnl.totalInCash}</p>
-              </div>
-              <div className="flex justify-between w-[500px] font-bold">
-                <p>Income By Bank:</p> <p>{pnl.totalInBank}</p>
-              </div>
-              <div className="flex justify-between w-[500px] font-bold">
-                <p>Outcome By Cash:</p> <p>{pnl.totalOutCash}</p>
-              </div>
-              <div className="flex justify-between w-[500px] font-bold">
-                <p>Outcome By Bank:</p> <p>{pnl.totalOutBank}</p>
-              </div>
-              <div className="flex justify-between w-[500px] font-bold border-t-2 border-black"></div>
-              <div className="flex justify-between w-[500px] font-bold">
-                <p>Total:</p>{" "}
-                <p>
-                  {Number(pnl.totalInCash) +
-                    Number(pnl.totalInBank) -
-                    Number(pnl.totalOutCash) -
-                    Number(pnl.totalOutBank)}
-                </p>
-              </div>
-            </div>
-          )}
         </TitleCard>
       </div>
 
