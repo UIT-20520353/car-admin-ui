@@ -21,20 +21,20 @@ const validationSchema = yup.object({
     .required("Please input amount !"),
   rego: yup
     .string()
-    .matches(/^\d*[1-9]\d*$/, "Invalid amount")
-    .required("Please input amount !"),
+    .matches(/^\d*[0-9]\d*$/, "Invalid amount")
+    .default("0"),
   carPlay: yup
     .string()
-    .matches(/^\d*[1-9]\d*$/, "Invalid amount")
-    .required("Please input amount !"),
+    .matches(/^\d*[0-9]\d*$/, "Invalid amount")
+    .default("0"),
   keys: yup
     .string()
-    .matches(/^\d*[1-9]\d*$/, "Invalid amount")
-    .required("Please input amount !"),
+    .matches(/^\d*[0-9]\d*$/, "Invalid amount")
+    .default("0"),
   gps: yup
     .string()
-    .matches(/^\d*[1-9]\d*$/, "Invalid amount")
-    .required("Please input amount !"),
+    .matches(/^\d*[0-9]\d*$/, "Invalid amount")
+    .default("0"),
   note: yup.string(),
   buyingDate: yup
     .date()
@@ -59,11 +59,11 @@ const EditModal = ({ size, onClose, refresh, car }) => {
       registrationPlate: "",
       buyingDate: dayjs().format("YYYY-MM-DD"),
       buyingPrice: "",
-      rego: "",
-      keys: "",
-      gps: "",
+      rego: "0",
+      keys: "0",
+      gps: "0",
       note: "",
-      carPlay: "",
+      carPlay: "0",
     },
   });
 

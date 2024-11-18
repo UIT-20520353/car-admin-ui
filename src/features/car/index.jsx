@@ -197,6 +197,7 @@ function CarManagement() {
                   <th>Car Play</th>
                   <th>GPS</th>
                   <th>Rego</th>
+                  <th>Keys</th>
                   <th>Status</th>
                   <th>Action</th>
                 </tr>
@@ -216,6 +217,7 @@ function CarManagement() {
                         <td className="text-base">{car.carPlay}</td>
                         <td className="text-base">{car.gps}</td>
                         <td className="text-base">{car.rego}</td>
+                        <td className="text-base">{car.keys}</td>
                         <td>{renderStatus(car)}</td>
                         <td className="flex gap-2">
                           <button
