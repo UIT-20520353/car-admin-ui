@@ -206,10 +206,15 @@ function ContractPage() {
                         <td>{contract.customerName}</td>
                         <td>{EContractStatus[contract.status].label}</td>
                         <td>
+                          {!!contract.newCar ? (
+                            <p className="whitespace-pre text-wrap">
+                              {`New Car: ${contract.newCar.registrationPlate}`}
+                            </p>
+                          ) : (
                           <p className="whitespace-pre text-wrap">
                             {contract.note || "--"}
-                            {!!contract.newCar && `New Registration Plate: ${!!contract.newCar.registrationPlate}`}
-                          </p>
+                          </p>)
+                          }
                         </td>
                         <td className="flex gap-2">
                           <button
