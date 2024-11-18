@@ -264,12 +264,14 @@ function RentManagement() {
                           >
                             <TrashIcon width={20} height={20} />
                           </button>
-                          <button
-                            className={`btn btn-square btn-outline btn-sm btn-success`}
-                            onClick={() => setSelectedLog(rental)}
-                          >
-                            <DocumentArrowDownIcon width={20} height={20} />
-                          </button>
+                          {profile?.role === "ADMIN" && (
+                            <button
+                              className={`btn btn-square btn-outline btn-sm btn-success`}
+                              onClick={() => setSelectedLog(rental)}
+                            >
+                              <DocumentArrowDownIcon width={20} height={20} />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}

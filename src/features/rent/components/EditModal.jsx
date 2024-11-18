@@ -128,7 +128,12 @@ const EditModal = ({ rental, size, onClose, refresh }) => {
   };
 
   const onSubmit = (data) => {
-    dispatch(editRental({ data, id: rental.id }));
+    dispatch(
+      editRental({
+        data: { ...data, contractId: rental.contract.id },
+        id: rental.id,
+      })
+    );
   };
 
   const errorText =

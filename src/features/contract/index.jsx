@@ -26,6 +26,7 @@ import NoSymbolIcon from "@heroicons/react/24/outline/NoSymbolIcon";
 import EndModal from "./components/EndModal";
 import { DocumentArrowDownIcon } from "@heroicons/react/24/outline";
 import LogModal from "../common/LogModal";
+import { getStaffs } from "../../redux/staffSlice";
 
 const TopSideButtons = ({ onOpenAddModal }) => {
   return (
@@ -102,6 +103,7 @@ function ContractPage() {
 
   useEffect(() => {
     dispatch(getCars({ pagination: { page: 0, size: 9999 }, filter: {} }));
+    dispatch(getStaffs({ pagination: { page: 0, size: 9999 }, filter: {} }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -218,7 +220,9 @@ function ContractPage() {
                           </button>
                           <button
                             className={`btn btn-square btn-outline btn-sm btn-primary `}
-                            disabled={contract.status !== "END"}
+                            disabled={
+                              contract.status !== "END" || !!contract.newCar
+                            }
                             onClick={() => setRenewContract(contract)}
                           >
                             <ArrowPathRoundedSquareIcon
@@ -233,12 +237,14 @@ function ContractPage() {
                           >
                             <NoSymbolIcon width={20} height={20} />
                           </button>
-                          <button
-                            className={`btn btn-square btn-outline btn-sm btn-success`}
-                            onClick={() => setSelectedLog(contract)}
-                          >
-                            <DocumentArrowDownIcon width={20} height={20} />
-                          </button>
+                          {profile?.role === "ADMIN" && (
+                            <button
+                              className={`btn btn-square btn-outline btn-sm btn-success`}
+                              onClick={() => setSelectedLog(contract)}
+                            >
+                              <DocumentArrowDownIcon width={20} height={20} />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}

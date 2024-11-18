@@ -14,6 +14,7 @@ import { setPageTitle } from "../common/headerSlice";
 import AddIncome from "./components/AddIncome";
 import EditIncome from "./components/EditIncome";
 import LogModal from "../common/LogModal";
+import { selectAuthState } from "../../redux/authSlice";
 // import AddModal from "./components/AddModal";
 
 const TopSideButtons = ({ onOpenAddIncome }) => {
@@ -32,6 +33,7 @@ const TopSideButtons = ({ onOpenAddIncome }) => {
 function IncomeOutcomePage() {
   const dispatch = useDispatch();
   const { inouts, updateResult, pnl } = useSelector(selectInoutState);
+  const { profile } = useSelector(selectAuthState);
   const [isOpenAddIncome, setOpenAddIncome] = useState(false);
   // const [searchText, setSearchText] = useState("");
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
@@ -198,12 +200,14 @@ function IncomeOutcomePage() {
                           >
                             <PencilIcon width={20} height={20} />
                           </button>
-                          <button
-                            className={`btn btn-square btn-outline btn-sm btn-success`}
-                            onClick={() => setSelectedLog(car)}
-                          >
-                            <DocumentArrowDownIcon width={20} height={20} />
-                          </button>
+                          {profile?.role === "ADMIN" && (
+                            <button
+                              className={`btn btn-square btn-outline btn-sm btn-success`}
+                              onClick={() => setSelectedLog(car)}
+                            >
+                              <DocumentArrowDownIcon width={20} height={20} />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}

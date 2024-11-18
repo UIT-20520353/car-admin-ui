@@ -13,6 +13,8 @@ import {
 import { EToastType, showToast } from "../../../app/toast";
 import * as dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import { selectStaffState } from "../../../redux/staffSlice";
+import { selectAuthState } from "../../../redux/authSlice";
 
 dayjs.extend(isSameOrAfter);
 
@@ -58,12 +60,16 @@ const validationSchema = yup.object({
     .required("Duration is required")
     .typeError("Duration must be a number")
     .min(0, "Duration must be greater than 0"),
+  createUserId: yup.number(),
 });
 
 const AddModal = ({ open, size, onClose, refresh }) => {
   const dispatch = useDispatch();
   const { cars } = useSelector(selectCarState);
+  const { staffs } = useSelector(selectStaffState);
+  const { profile } = useSelector(selectAuthState);
   const { addContractResult } = useSelector(selectConstractState);
+
   const [selectCar, setSelectCar] = useState(null);
   const [step, setStep] = useState(1);
   const [carName, setCarname] = useState("");
@@ -75,6 +81,7 @@ const AddModal = ({ open, size, onClose, refresh }) => {
     formState: { errors },
     reset,
     watch,
+    setValue,
   } = useForm({
     mode: "onChange",
     resolver: yupResolver(validationSchema),
@@ -86,6 +93,7 @@ const AddModal = ({ open, size, onClose, refresh }) => {
       date: dayjs().format("YYYY-MM-DD"),
       startDate: dayjs().format("YYYY-MM-DD"),
       duration: 0,
+      createUserId: "",
     },
   });
 
@@ -144,6 +152,12 @@ const AddModal = ({ open, size, onClose, refresh }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addContractResult]);
+
+  useEffect(() => {
+    if (profile) {
+      setValue("createUserId", profile.id);
+    }
+  }, [profile]);
 
   useEffect(() => {
     if (!open) {
@@ -270,6 +284,21 @@ const AddModal = ({ open, size, onClose, refresh }) => {
                   value={endDate}
                   disabled
                 />
+              </div>
+              <div className="flex flex-col items-start w-full gap-1">
+                <label className="ml-3 text-base font-medium">
+                  Create User
+                </label>
+                <select
+                  className="w-full select select-bordered"
+                  {...register("createUserId")}
+                >
+                  {staffs.list.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.username}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
