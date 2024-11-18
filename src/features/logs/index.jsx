@@ -136,7 +136,7 @@ function LogPage() {
               <thead>
                 <tr>
                   <th>Id</th>
-                  <th>Cate</th>
+                  <th>Category</th>
                   <th>Type</th>
                   <th>Record Id</th>
                   <th>User</th>
@@ -151,8 +151,8 @@ function LogPage() {
                     {items.list.map((car) => (
                       <tr key={`car-${car.id}`}>
                         <td className="text-base">{car.id}</td>
-                        <td className="text-base">{car.type}</td>
                         <td className="text-base">{car.cate}</td>
+                        <td className="text-base">{car.type}</td>
                         <td className="text-base">{car.recordId}</td>
                         <td className="text-base">
                           {car.createUser ? car.createUser.username : "SYSTEM"}
