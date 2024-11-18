@@ -56,19 +56,19 @@ function CarManagement() {
     switch (car.status) {
       case "FREE":
         return (
-          <div className="flex items-center justify-center p-3 text-base text-white badge badge-success">
+          <div className="flex items-center justify-center p-2 text-base text-white badge badge-success w-[90px]">
             Free
           </div>
         );
       case "ON_RENT":
         return (
-          <div className="flex items-center justify-center p-3 text-base text-white badge badge-error">
+          <div className="flex items-center justify-center p-2 text-base text-white badge badge-error w-[90px]">
             On rent
           </div>
         );
       default:
         return (
-          <div className="flex items-center justify-center p-3 text-base text-white badge badge-info">
+          <div className="flex items-center justify-center p-2 text-base text-white badge badge-info w-[90px]">
             None
           </div>
         );

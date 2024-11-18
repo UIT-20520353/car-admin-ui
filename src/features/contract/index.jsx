@@ -208,6 +208,7 @@ function ContractPage() {
                         <td>
                           <p className="whitespace-pre text-wrap">
                             {contract.note || "--"}
+                            {!!contract.newCar && `New Registration Plate: ${!!contract.newCar.registrationPlate}`}
                           </p>
                         </td>
                         <td className="flex gap-2">
