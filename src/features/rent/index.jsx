@@ -95,7 +95,6 @@ function RentManagement() {
     if (profile?.role === "ADMIN") {
       return true;
     }
-
     return profile?.id === rental.createUser.id && isLessThan24Hours;
   };
 
@@ -231,7 +230,7 @@ function RentManagement() {
                   <Fragment>
                     {rentals.list.map((rental) => (
                       <tr key={`rental-${rental.id}`}>
-                        <td>{rental.contract.car.registrationPlate}</td>
+                        <td>{rental.car.registrationPlate}</td>
                         <td>#{rental.contract.id}</td>
                         <td>{dayjs(rental.date).format("DD/MM/YYYY")}</td>
                         <td>{dayjs(rental.startDate).format("DD/MM/YYYY")}</td>
@@ -253,6 +252,7 @@ function RentManagement() {
                               isShowEditButton(rental) ? "flex" : "hidden"
                             }`}
                             onClick={() => setSelectedRental(rental)}
+                            disabled={rental.contract.car.id !== rental.car.id}
                           >
                             <Pencil width={20} height={20} />
                           </button>
