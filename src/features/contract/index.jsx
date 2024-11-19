@@ -199,7 +199,7 @@ function ContractPage() {
                   <Fragment>
                     {contracts.list.map((contract) => (
                       <tr key={`contract-${contract.id}`}>
-                        <td>#{contract.id}</td>
+                        <td>#{ !!contract.newCar ? contract.newContractId : contract.id}</td>
                         <td>{contract.car.registrationPlate}</td>
                         <td>
                           {dayjs(contract.startDate).format("DD/MM/YYYY")}
