@@ -184,6 +184,7 @@ function ContractPage() {
             <table className="table w-full">
               <thead>
                 <tr>
+                  <th>Contract Id</th>
                   <th>Registration plate</th>
                   <th>Start date</th>
                   <th>End date</th>
@@ -198,6 +199,7 @@ function ContractPage() {
                   <Fragment>
                     {contracts.list.map((contract) => (
                       <tr key={`contract-${contract.id}`}>
+                        <td>#{contract.id}</td>
                         <td>{contract.car.registrationPlate}</td>
                         <td>
                           {dayjs(contract.startDate).format("DD/MM/YYYY")}
