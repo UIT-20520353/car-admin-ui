@@ -68,7 +68,7 @@ function LeftSidebar() {
         })}
         {profile?.role === "ADMIN" && (
           <>
-            <li className="">
+            {/* <li className="">
               <NavLink
                 end
                 to="/item"
@@ -84,7 +84,7 @@ function LeftSidebar() {
                   ></span>
                 ) : null}
               </NavLink>
-            </li>
+            </li> */}
             <li className="">
               <NavLink
                 end

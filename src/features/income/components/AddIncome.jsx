@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import ErrorText from "../../../components/Typography/ErrorText";
@@ -7,16 +7,37 @@ import { useDispatch, useSelector } from "react-redux";
 import useHandleResponse from "../../../hooks/useHandleResponse";
 import { addInout } from "../../../redux/inoutSlice";
 import { getItems, selectItems } from "../../../redux/itemSlice";
+import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
+dayjs.extend(isSameOrAfter);
+
+const minDate = dayjs().startOf("day");
 const validationSchema = yup.object({
-  amount: yup
+  income: yup
     .string()
-    .matches(/^\d*[1-9]\d*$/, "Invalid amount")
-    .required("Please input amount !"),
-  itemId: yup.string().required("Please input item !"),
+    .matches(/^\d*[0-9]\d*$/, "Invalid income")
+    .default("0"),
+  outcomeCash: yup
+    .string()
+    .matches(/^\d*[0-9]\d*$/, "Invalid outcome")
+    .default("0"),
+  outcomeBank: yup
+    .string()
+    .matches(/^\d*[0-9]\d*$/, "Invalid outcome")
+    .default("0"),
   note: yup.string(),
-  type: yup.string().required("Please select type !"),
-  payment: yup.string().required("Please select payment !"),
+  date: yup
+    .date()
+    .required("Date is required")
+    .typeError("Invalid date format")
+    .test("min-date", "Date cannot be in the past", (value) => {
+      return value && dayjs(value).isSameOrAfter(minDate, "day");
+    })
+    .max(
+      new Date(new Date().setDate(new Date().getDate() + 3)),
+      "Date cannot be more than 3 days in the future"
+    ),
 });
 
 const AddIncome = ({ open, size, onClose }) => {
@@ -39,11 +60,11 @@ const AddIncome = ({ open, size, onClose }) => {
     mode: "onChange",
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      amount: "",
-      itemId: null,
+      income: "0",
+      outcomeBank: "0",
+      outcomeCash: "0",
       note: "",
-      type: null,
-      payment: null,
+      date: dayjs().format("YYYY-MM-DD hh:mm"),
     },
   });
 
@@ -77,51 +98,43 @@ const AddIncome = ({ open, size, onClose }) => {
           <form onSubmit={handleSubmit(onSubmit)} className="w-full">
             <div className="flex flex-col w-full gap-2">
               <div className="flex flex-col items-start w-full gap-1">
-                <label className="ml-3 text-base font-medium">Type</label>
-                <select
-                  className="w-full select select-bordered"
-                  {...register("type")}
-                >
-                  <option value={null}></option>
-                  <option value="INCOME">INCOME</option>
-                  <option value="OUTCOME">OUTCOME</option>
-                </select>
-              </div>
-              <div className="flex flex-col items-start w-full gap-1">
-                <label className="ml-3 text-base font-medium">Payment</label>
-                <select
-                  className="w-full select select-bordered"
-                  {...register("payment")}
-                >
-                  <option value={null}></option>
-                  <option value="CASH">CASH</option>
-                  <option value="BANK">BANK</option>
-                </select>
-              </div>
-              {!!items.total && (
-                <div className="flex flex-col items-start w-full gap-1">
-                  <label className="ml-3 text-base font-medium">Item</label>
-                  <select
-                    className="w-full select select-bordered"
-                    {...register("itemId")}
-                  >
-                    <option value={null}></option>
-                    {items.list.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              <div className="flex flex-col items-start w-full gap-1">
-                <label className="ml-3 text-base font-medium">Amount</label>
+                <label className="ml-3 text-base font-medium">Income</label>
                 <input
                   type="text"
                   className="w-full input input-bordered"
-                  placeholder="Enter Amount"
-                  {...register("amount")}
+                  placeholder="Enter income"
+                  {...register("income")}
+                />
+              </div>
+              <div className="flex flex-col items-start w-full gap-1">
+                <label className="ml-3 text-base font-medium">
+                  Outcome By Cash
+                </label>
+                <input
+                  type="text"
+                  className="w-full input input-bordered"
+                  placeholder="Enter outcome"
+                  {...register("outcomeCash")}
+                />
+              </div>
+              <div className="flex flex-col items-start w-full gap-1">
+                <label className="ml-3 text-base font-medium">
+                  Outcome By Bank
+                </label>
+                <input
+                  type="text"
+                  className="w-full input input-bordered"
+                  placeholder="Enter outcome"
+                  {...register("outcomeBank")}
+                />
+              </div>
+              <div className="flex flex-col items-start w-full gap-1">
+                <label className="ml-3 text-base font-medium">Date</label>
+                <input
+                  type="datetime-local"
+                  className="w-full input input-bordered"
+                  placeholder="Select date and time"
+                  {...register("date")}
                 />
               </div>
               <div className="flex flex-col items-start w-full gap-1">
@@ -135,10 +148,10 @@ const AddIncome = ({ open, size, onClose }) => {
               </div>
             </div>
             <ErrorText styleClass="my-4">
-              {errors?.amount?.message ||
-                errors?.type?.message ||
-                errors?.itemId?.message ||
-                errors?.payment?.message}
+              {errors?.income?.message ||
+                errors?.date?.message ||
+                errors?.outcomeBank?.message ||
+                errors?.outcomeCash?.message}
             </ErrorText>
             <div className="flex items-center justify-center w-full gap-4 mt-5">
               <button

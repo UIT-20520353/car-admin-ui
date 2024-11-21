@@ -22,3 +22,17 @@ export const hoursBetween = (date1, date2) => {
 
   return diffInHours;
 };
+
+export const formatTime = (value) => {
+  if (!value) return "--";
+
+  const date = new Date(value);
+  let format = "hh:mm";
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  format = format.replace("hh", hours);
+  format = format.replace("mm", minutes);
+
+  return format;
+};

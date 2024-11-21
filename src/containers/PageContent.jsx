@@ -40,7 +40,7 @@ function PageContent() {
             <Route path="/income-outcome" element={<IncomeOutcomePage />} />
 
             <Route path="/staff" element={<StaffPage />} />
-            <Route path="/item" element={<ItemPage />} />
+            {/* <Route path="/item" element={<ItemPage />} /> */}
             <Route path="/logs" element={<LogPage />} />
             <Route index element={<RentManagement />} />
             {/* {routes.map((route, key) => {

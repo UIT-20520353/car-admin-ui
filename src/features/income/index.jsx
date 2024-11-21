@@ -9,7 +9,7 @@ import React, {
 import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
 import { getInOuts, getPnl, selectInoutState } from "../../redux/inoutSlice";
-import { formatDateNoTime } from "../../utils/date";
+import { formatDateNoTime, formatTime } from "../../utils/date";
 import { setPageTitle } from "../common/headerSlice";
 import AddIncome from "./components/AddIncome";
 import EditIncome from "./components/EditIncome";
@@ -54,29 +54,6 @@ function IncomeOutcomePage() {
     dispatch(getPnl());
   }, [updateResult, pagination]);
 
-  const renderStatus = (inout) => {
-    switch (inout.type) {
-      case "INCOME":
-        return (
-          <div className="flex items-center justify-center p-3 text-sm font-bold text-white badge badge-success w-[100px]">
-            INCOME
-          </div>
-        );
-      case "OUTCOME":
-        return (
-          <div className="flex items-center justify-center p-3 text-sm font-bold text-white badge badge-error w-[100px]">
-            OUTCOME
-          </div>
-        );
-      default:
-        return (
-          <div className="flex items-center justify-center p-3 text-base text-white badge badge-info w-[100px]">
-            None
-          </div>
-        );
-    }
-  };
-
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
@@ -119,44 +96,36 @@ function IncomeOutcomePage() {
           <div className="w-full overflow-x-auto scroll-custom max-h-[500px] overflow-y-auto">
             {pnl && (
               <div className="flex items-end w-full">
-                <div className="flex items-center justify-center h-10 px-8 text-white bg-blue-500 border border-transparent">
+                <div className="flex items-center justify-center h-10 px-8 text-white bg-blue-500 border border-transparent font-bold">
                   Total
                 </div>
                 <div className="flex flex-col items-start flex-1 justify-stretch">
-                  <span className="text-xs font-medium">Income By Cash</span>
+                  <span className="text-xs font-bold">Income</span>
                   <div className="flex items-center justify-between w-full h-10 px-2 text-black bg-white border border-l-0 border-gray-600">
                     <span>$</span>
-                    <span>{pnl.totalInCash}</span>
+                    <span>{pnl.income}</span>
                   </div>
                 </div>
                 <div className="flex flex-col items-start flex-1 justify-stretch">
-                  <span className="text-xs font-medium">Income By Bank</span>
+                  <span className="text-xs font-bold">Outcome By Cash</span>
                   <div className="flex items-center justify-between w-full h-10 px-2 text-black bg-white border border-l-0 border-gray-600">
                     <span>$</span>
-                    <span>{pnl.totalInBank}</span>
+                    <span>{pnl.outcomeByCash}</span>
                   </div>
                 </div>
                 <div className="flex flex-col items-start flex-1 justify-stretch">
-                  <span className="text-xs font-medium">Outcome By Cash</span>
+                  <span className="text-xs font-bold">Outcome By Bank</span>
                   <div className="flex items-center justify-between w-full h-10 px-2 text-black bg-white border border-l-0 border-gray-600">
                     <span>$</span>
-                    <span>{pnl.totalOutCash}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-start flex-1 justify-stretch">
-                  <span className="text-xs font-medium">Outcome By Bank</span>
-                  <div className="flex items-center justify-between w-full h-10 px-2 text-black bg-white border border-l-0 border-gray-600">
-                    <span>$</span>
-                    <span>{pnl.totalOutBank}</span>
+                    <span>{pnl.outcomeByBank}</span>
                   </div>
                 </div>
                 <div className="border border-transparent flex items-center justify-between flex-[2_2_0%] h-10 px-2 text-white bg-blue-500">
                   <span>$</span>
                   <span>
-                    {Number(pnl.totalInCash) +
-                      Number(pnl.totalInBank) -
-                      Number(pnl.totalOutCash) -
-                      Number(pnl.totalOutBank)}
+                    {Number(pnl.income) -
+                      Number(pnl.outcomeByCash) -
+                      Number(pnl.outcomeByBank)}
                   </span>
                 </div>
               </div>
@@ -165,11 +134,11 @@ function IncomeOutcomePage() {
             <table className="table w-full">
               <thead>
                 <tr>
-                  <th>Id</th>
-                  <th className="text-center">Type</th>
-                  <th>Created Date</th>
-                  <th>Amount</th>
-                  <th>Item</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Icome</th>
+                  <th>Outcome By Cash</th>
+                  <th>Outcome By Bank</th>
                   <th>Created User</th>
                   <th>Note</th>
                   <th>Action</th>
@@ -180,15 +149,13 @@ function IncomeOutcomePage() {
                   <Fragment>
                     {inouts.list.map((car) => (
                       <tr key={`car-${car.id}`}>
-                        <td className="text-base">{car.id}</td>
-                        <td className="flex justify-center">
-                          {renderStatus(car)}
-                        </td>
                         <td className="text-base">
-                          {formatDateNoTime(car.createdDate)}
+                          {formatDateNoTime(car.date)}
                         </td>
-                        <td className="text-base">{car.amount}</td>
-                        <td className="text-base">{car.item}</td>
+                        <td className="text-base">{formatTime(car.date)}</td>
+                        <td className="text-base">{car.income}</td>
+                        <td className="text-base">{car.outcomeCash}</td>
+                        <td className="text-base">{car.outcomeBank}</td>
                         <td className="text-base">
                           {car.createdUser.username}
                         </td>
