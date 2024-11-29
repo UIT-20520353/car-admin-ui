@@ -40,21 +40,21 @@ const validationSchema = yup.object({
   date: yup
     .date()
     .required("Date is required")
-    .typeError("Invalid date format")
-    .test("min-date", "Date cannot be in the past", (value) => {
-      return value && dayjs(value).isSameOrAfter(minDate, "day");
-    })
-    .max(
-      new Date(new Date().setDate(new Date().getDate() + 3)),
-      "Date cannot be more than 3 days in the future"
-    ),
+    .typeError("Invalid date format"),
+  // .test("min-date", "Date cannot be in the past", (value) => {
+  //   return value && dayjs(value).isSameOrAfter(minDate, "day");
+  // })
+  // .max(
+  //   new Date(new Date().setDate(new Date().getDate() + 3)),
+  //   "Date cannot be more than 3 days in the future"
+  // )
   startDate: yup
     .date()
     .required("Start date is required")
-    .typeError("Invalid date format")
-    .test("min-start-date", "Start date cannot be in the past", (value) => {
-      return value && dayjs(value).isSameOrAfter(minDate, "day");
-    }),
+    .typeError("Invalid date format"),
+  // .test("min-start-date", "Start date cannot be in the past", (value) => {
+  //   return value && dayjs(value).isSameOrAfter(minDate, "day");
+  // })
   duration: yup
     .number()
     .required("Duration is required")
@@ -122,7 +122,9 @@ const AddModal = ({ open, size, onClose, refresh }) => {
 
   const filteredCars = useMemo(() => {
     const name = carName.toLowerCase();
-    return cars.list.filter((car) => car.name.toLowerCase().includes(name));
+    return cars.list.filter((car) =>
+      car.registrationPlate.toLowerCase().includes(name)
+    );
   }, [cars, carName]);
 
   const onSubmit = (data) => {
@@ -325,7 +327,7 @@ const AddModal = ({ open, size, onClose, refresh }) => {
             <input
               type="search"
               value={carName}
-              placeholder="Car name"
+              placeholder="Registration Plate"
               onChange={(e) => setCarname(e.target.value)}
               className="w-full input input-bordered"
             />

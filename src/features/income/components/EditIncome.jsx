@@ -138,33 +138,33 @@ const EditIncome = ({ size, onClose, inout }) => {
           <form onSubmit={handleSubmit(onSubmit)} className="w-full">
             <div className="flex flex-col w-full gap-2">
               <div className="flex flex-col items-start w-full gap-1">
-                <label className="ml-3 text-base font-medium">Income</label>
+                <label className="ml-3 text-base font-medium">Pick</label>
                 <input
                   type="text"
                   className="w-full input input-bordered"
-                  placeholder="Enter income"
+                  placeholder="Enter pick"
                   {...register("income")}
                 />
               </div>
               <div className="flex flex-col items-start w-full gap-1">
                 <label className="ml-3 text-base font-medium">
-                  Outcome By Cash
+                  Expense By Cash
                 </label>
                 <input
                   type="text"
                   className="w-full input input-bordered"
-                  placeholder="Enter outcome"
+                  placeholder="Enter expense"
                   {...register("outcomeCash")}
                 />
               </div>
               <div className="flex flex-col items-start w-full gap-1">
                 <label className="ml-3 text-base font-medium">
-                  Outcome By Bank
+                  Expense By Bank
                 </label>
                 <input
                   type="text"
                   className="w-full input input-bordered"
-                  placeholder="Enter outcome"
+                  placeholder="Enter expense"
                   {...register("outcomeBank")}
                 />
               </div>

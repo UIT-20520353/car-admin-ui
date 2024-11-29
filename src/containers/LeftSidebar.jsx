@@ -36,7 +36,7 @@ function LeftSidebar() {
               src="/logo192.png"
               alt="DashWind Logo"
             />
-            Admin
+            <span className="uppercase">{profile && profile.role}</span>
           </Link>
         </li>
         {routes.map((route, k) => {

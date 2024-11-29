@@ -24,6 +24,7 @@ import {
 } from "../../utils/globalConstantUtil";
 import { openModal } from "../common/modalSlice";
 import LogModal from "../common/LogModal";
+import { fomatMoney } from "../../utils/uniqId";
 
 const EPayment = {
   CASH: { value: "CASH", label: "Cash" },
@@ -210,7 +211,7 @@ function RentManagement() {
 
           <div className="w-full overflow-x-auto scroll-custom">
             <table className="table w-full">
-              <thead>
+              <thead className="bg-[#636363] text-white">
                 <tr>
                   <th>Registion Plate</th>
                   <th>Contract ID</th>
@@ -240,7 +241,7 @@ function RentManagement() {
                         <td>
                           {ERentalStatus[rental.status || "ON_TIME"].label}
                         </td>
-                        <td>{rental.amount}</td>
+                        <td>{fomatMoney(rental.amount)}</td>
                         <td>
                           <p className="whitespace-pre text-wrap">
                             {rental.note || "--"}

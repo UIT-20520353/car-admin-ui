@@ -4,4 +4,10 @@ const uniqId = () => {
   return `${id}${Math.trunc(Math.random() * 100000000)}`;
 };
 
+const fomatMoney = (money) => {
+  const formattedMoney = new Intl.NumberFormat("en-US").format(Number(money));
+  return formattedMoney;
+};
+
+export { fomatMoney };
 export default uniqId;

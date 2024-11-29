@@ -27,7 +27,7 @@ const routes = [
   {
     path: "/income-outcome",
     icon: <ArrowTrendingUpIcon className={iconClasses} />,
-    name: "Income & Outcome",
+    name: "Cash Tracking",
   },
   // {
   //   path: "/staff",

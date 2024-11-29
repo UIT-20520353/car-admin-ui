@@ -89,7 +89,7 @@ function StaffPage() {
         >
           <div className="w-full overflow-x-auto scroll-custom">
             <table className="table w-full">
-              <thead>
+              <thead className="bg-[#636363] text-white">
                 <tr>
                   <th>Id</th>
                   <th>Username</th>

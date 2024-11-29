@@ -76,7 +76,10 @@ function ContractPage() {
     const isLessThan24Hours =
       dayjs().diff(dayjs(contract.createdDate), "hour") < 24;
 
-    if (contract.status === EContractStatus.END.value) {
+    if (
+      contract.status === EContractStatus.END.value ||
+      contract.status === EContractStatus.RENEW.value
+    ) {
       return false;
     }
 
@@ -84,7 +87,7 @@ function ContractPage() {
       return true;
     }
 
-    return profile?.id === contract.createUser.id && isLessThan24Hours;
+    return isLessThan24Hours;
   };
 
   const onReset = () => {
@@ -182,7 +185,7 @@ function ContractPage() {
           </div>
           <div className="w-full overflow-x-auto scroll-custom">
             <table className="table w-full">
-              <thead>
+              <thead className="bg-[#636363] text-white">
                 <tr>
                   <th>Contract Id</th>
                   <th>Registration plate</th>
@@ -190,6 +193,7 @@ function ContractPage() {
                   <th>End date</th>
                   <th>Customer Name</th>
                   <th>Contract status</th>
+                  <th>Renew of Contract</th>
                   <th>Note</th>
                   <th>Action</th>
                 </tr>
@@ -199,7 +203,12 @@ function ContractPage() {
                   <Fragment>
                     {contracts.list.map((contract) => (
                       <tr key={`contract-${contract.id}`}>
-                        <td>#{ !!contract.newCar ? contract.newContractId : contract.id}</td>
+                        <td>
+                          #
+                          {!!contract.newCar
+                            ? contract.newContractId
+                            : contract.id}
+                        </td>
                         <td>{contract.car.registrationPlate}</td>
                         <td>
                           {dayjs(contract.startDate).format("DD/MM/YYYY")}
@@ -207,16 +216,17 @@ function ContractPage() {
                         <td>{dayjs(contract.endDate).format("DD/MM/YYYY")}</td>
                         <td>{contract.customerName}</td>
                         <td>{EContractStatus[contract.status].label}</td>
+                        <td>{contract.renewContractId ?? "--"}</td>
                         <td>
                           {!!contract.newCar ? (
                             <p className="whitespace-pre text-wrap">
                               {`New Car: ${contract.newCar.registrationPlate}`}
                             </p>
                           ) : (
-                          <p className="whitespace-pre text-wrap">
-                            {contract.note || "--"}
-                          </p>)
-                          }
+                            <p className="whitespace-pre text-wrap">
+                              {contract.note || "--"}
+                            </p>
+                          )}
                         </td>
                         <td className="flex gap-2">
                           <button
@@ -229,7 +239,7 @@ function ContractPage() {
                           <button
                             className={`btn btn-square btn-outline btn-sm btn-primary `}
                             disabled={
-                              contract.status !== "END" || !!contract.newCar
+                              contract.status !== "RENEW" || !!contract.newCar
                             }
                             onClick={() => setRenewContract(contract)}
                           >

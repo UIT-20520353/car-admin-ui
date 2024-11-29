@@ -25,6 +25,7 @@ import { openModal } from "../common/modalSlice";
 import AddModal from "./components/AddModal";
 import EditModal from "./components/EditModal";
 import LogModal from "../common/LogModal";
+import { fomatMoney } from "../../utils/uniqId";
 
 const TopSideButtons = ({ onOpenAddModal }) => {
   return (
@@ -46,7 +47,11 @@ function CarManagement() {
   const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
   const [selectedCar, setSelectedCar] = useState(null);
-  const [filter, setFilter] = useState({ name: "", status: "" });
+  const [filter, setFilter] = useState({
+    registrationPlate: "",
+    status: "",
+    isSold: false,
+  });
   const [selectedLog, setSelectedLog] = useState(null);
   const loaderRef = useRef(null);
 
@@ -92,12 +97,11 @@ function CarManagement() {
 
   const onReset = () => {
     setPagination({ page: 0, size: 10 });
-    setFilter({ name: "" });
+    setFilter({ registrationPlate: "", status: "", isSold: false });
   };
 
   const fetchCars = useCallback(() => {
     dispatch(getCars({ pagination, filter }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination, soldCarResult]);
 
   useEffect(() => {
@@ -160,9 +164,12 @@ function CarManagement() {
         >
           <div className="flex items-center w-full gap-3 mb-6">
             <SearchBar
-              searchText={filter.name}
+              searchText={filter.registrationPlate}
               styleClass="w-1/3"
-              setSearchText={(name) => setFilter((prev) => ({ ...prev, name }))}
+              setSearchText={(name) =>
+                setFilter((prev) => ({ ...prev, registrationPlate: name }))
+              }
+              placeholderText="Search by Registration plate"
             />
             <select
               className="w-1/3 select select-bordered select-sm"
@@ -187,7 +194,7 @@ function CarManagement() {
           </div>
           <div className="w-full overflow-auto scroll-custom max-h-96">
             <table className="table w-full">
-              <thead>
+              <thead className="bg-[#636363] text-white">
                 <tr>
                   <th>Registration plate</th>
                   <th>Name</th>
@@ -213,11 +220,13 @@ function CarManagement() {
                         <td className="text-base">
                           {formatDateNoTime(car.buyingDate)}
                         </td>
-                        <td className="text-base">{car.buyingPrice}</td>
-                        <td className="text-base">{car.carPlay}</td>
-                        <td className="text-base">{car.gps}</td>
-                        <td className="text-base">{car.rego}</td>
-                        <td className="text-base">{car.keys}</td>
+                        <td className="text-base">
+                          {fomatMoney(car.buyingPrice)}
+                        </td>
+                        <td className="text-base">{fomatMoney(car.carPlay)}</td>
+                        <td className="text-base">{fomatMoney(car.gps)}</td>
+                        <td className="text-base">{fomatMoney(car.rego)}</td>
+                        <td className="text-base">{fomatMoney(car.keys)}</td>
                         <td>{renderStatus(car)}</td>
                         <td className="flex gap-2">
                           <button

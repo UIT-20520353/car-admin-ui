@@ -15,6 +15,7 @@ import AddIncome from "./components/AddIncome";
 import EditIncome from "./components/EditIncome";
 import LogModal from "../common/LogModal";
 import { selectAuthState } from "../../redux/authSlice";
+import { fomatMoney } from "../../utils/uniqId";
 // import AddModal from "./components/AddModal";
 
 const TopSideButtons = ({ onOpenAddIncome }) => {
@@ -45,7 +46,7 @@ function IncomeOutcomePage() {
   const onOpenAddIncome = () => setOpenAddIncome(true);
 
   useEffect(() => {
-    dispatch(setPageTitle({ title: "Income & OutCome Management" }));
+    dispatch(setPageTitle({ title: "Cash Tracking " }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -89,58 +90,47 @@ function IncomeOutcomePage() {
     <Fragment>
       <div>
         <TitleCard
-          title="Income & OutCome Dashboard"
+          title="Cash Tracking"
           topMargin="mt-2"
           TopSideButtons={<TopSideButtons onOpenAddIncome={onOpenAddIncome} />}
         >
           <div className="w-full overflow-x-auto scroll-custom max-h-[500px] overflow-y-auto">
-            {pnl && (
-              <div className="flex items-end w-full">
-                <div className="flex items-center justify-center h-10 px-8 text-white bg-blue-500 border border-transparent font-bold">
-                  Total
-                </div>
-                <div className="flex flex-col items-start flex-1 justify-stretch">
-                  <span className="text-xs font-bold">Income</span>
-                  <div className="flex items-center justify-between w-full h-10 px-2 text-black bg-white border border-l-0 border-gray-600">
-                    <span>$</span>
-                    <span>{pnl.income}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-start flex-1 justify-stretch">
-                  <span className="text-xs font-bold">Outcome By Cash</span>
-                  <div className="flex items-center justify-between w-full h-10 px-2 text-black bg-white border border-l-0 border-gray-600">
-                    <span>$</span>
-                    <span>{pnl.outcomeByCash}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-start flex-1 justify-stretch">
-                  <span className="text-xs font-bold">Outcome By Bank</span>
-                  <div className="flex items-center justify-between w-full h-10 px-2 text-black bg-white border border-l-0 border-gray-600">
-                    <span>$</span>
-                    <span>{pnl.outcomeByBank}</span>
-                  </div>
-                </div>
-                <div className="border border-transparent flex items-center justify-between flex-[2_2_0%] h-10 px-2 text-white bg-blue-500">
-                  <span>$</span>
-                  <span>
-                    {Number(pnl.income) -
-                      Number(pnl.outcomeByCash) -
-                      Number(pnl.outcomeByBank)}
-                  </span>
-                </div>
-              </div>
-            )}
+            <table className="table w-full mt-4">
+              <thead className="bg-[#636363] text-white">
+                {pnl && (
+                  <tr>
+                    <th
+                      colSpan={2}
+                      className="text-sm bg-[#636363] text-white "
+                    >
+                      Total
+                    </th>
+                    <th className=" text-slate-900 bg-slate-300 text-right text-sm">
+                      {fomatMoney(pnl.income)}
+                    </th>
+                    <th className=" text-slate-900 bg-slate-300 text-right text-sm">
+                      {fomatMoney(pnl.outcomeByCash)}
+                    </th>
+                    <th className=" text-slate-900 bg-slate-300 text-right text-sm">
+                      {fomatMoney(pnl.outcomeByBank)}
+                    </th>
+                    <th
+                      className="text-sm  text-slate-900 bg-slate-300 text-right"
+                      colSpan={3}
+                    >
+                      {fomatMoney(pnl.income - Number(pnl.outcomeByCash))}
+                    </th>
+                  </tr>
+                )}
 
-            <table className="table w-full">
-              <thead>
                 <tr>
                   <th>Date</th>
                   <th>Time</th>
-                  <th>Icome</th>
-                  <th>Outcome By Cash</th>
-                  <th>Outcome By Bank</th>
-                  <th>Created User</th>
+                  <th className="text-right ">Pick</th>
+                  <th className="text-right">Expense By Cash</th>
+                  <th className="text-right">Expense By Bank</th>
                   <th>Note</th>
+                  <th>Created User</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -149,17 +139,26 @@ function IncomeOutcomePage() {
                   <Fragment>
                     {inouts.list.map((car) => (
                       <tr key={`car-${car.id}`}>
-                        <td className="text-base">
+                        <td className="text-base min-w-[70px] max-w-[70px]">
                           {formatDateNoTime(car.date)}
                         </td>
-                        <td className="text-base">{formatTime(car.date)}</td>
-                        <td className="text-base">{car.income}</td>
-                        <td className="text-base">{car.outcomeCash}</td>
-                        <td className="text-base">{car.outcomeBank}</td>
+                        <td className="text-base min-w-[30px]  max-w-[30px]">
+                          {formatTime(car.date)}
+                        </td>
+                        <td className="text-base text-right  min-w-[150px] max-w-[150px]">
+                          {car.income}
+                        </td>
+                        <td className="text-base text-right min-w-[150px]  max-w-[150px]">
+                          {car.outcomeCash}
+                        </td>
+                        <td className="text-base text-right min-w-[150px]  max-w-[150px]">
+                          {car.outcomeBank}
+                        </td>
+                        <td>{car.note}</td>
                         <td className="text-base">
                           {car.createdUser.username}
                         </td>
-                        <td>{car.note}</td>
+
                         <td className="flex gap-2">
                           <button
                             className="btn btn-square btn-outline btn-sm btn-primary"

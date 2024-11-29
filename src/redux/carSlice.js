@@ -11,11 +11,14 @@ export const getCars = createAsyncThunk(
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+
       params: {
         page: pagination.page,
         size: pagination.size,
-        "name.contains": filter.name || null,
+        "registrationPlate.contains": filter.registrationPlate || null,
         "status.equals": filter.status || null,
+        "isSold.equals":
+          !!filter.registrationPlate || !!filter.status ? null : filter.isSold,
       },
     });
 

@@ -13,6 +13,7 @@ import {
   resetEditContractResult,
   selectConstractState,
 } from "../../../redux/contractSlice";
+import { selectAuthState } from "../../../redux/authSlice";
 
 dayjs.extend(isSameOrAfter);
 
@@ -24,6 +25,7 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
   const [step, setStep] = useState(1);
   const [carName, setCarname] = useState("");
   const [endDate, setEndDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const { profile } = useSelector(selectAuthState);
 
   const validationSchema = yup.object({
     customerEmail: yup
@@ -131,6 +133,16 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
     dispatch(editContract({ data, car: selectCar, id: selectedContract.id }));
   };
 
+  const isShowEditButton = useMemo(() => {
+    if (profile?.role === "ADMIN") {
+      return true;
+    }
+    if (selectedContract) {
+      return profile?.id === selectedContract.createUser.id;
+    }
+    return false;
+  }, [profile, selectedContract]);
+
   const errorText =
     errors?.date?.message ||
     errors?.customerEmail?.message ||
@@ -225,6 +237,7 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
                   className="w-full input input-bordered"
                   placeholder="Select date"
                   {...register("date")}
+                  disabled={!isShowEditButton}
                 />
               </div>
 
@@ -235,6 +248,7 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
                   className="w-full input input-bordered"
                   placeholder="Enter email"
                   {...register("customerEmail")}
+                  disabled={!isShowEditButton}
                 />
               </div>
             </div>
@@ -249,6 +263,7 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
                   className="w-full input input-bordered"
                   placeholder="Enter customer name"
                   {...register("customerName")}
+                  disabled={!isShowEditButton}
                 />
               </div>
 
@@ -261,6 +276,7 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
                   className="w-full input input-bordered"
                   placeholder="Enter customer phone"
                   {...register("customerPhone")}
+                  disabled={!isShowEditButton}
                 />
               </div>
             </div>
@@ -273,6 +289,7 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
                   className="w-full input input-bordered"
                   placeholder="Select start date"
                   {...register("startDate")}
+                  disabled={!isShowEditButton}
                 />
               </div>
 
@@ -284,6 +301,7 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
                   placeholder="Enter duration"
                   min={0}
                   {...register("duration")}
+                  disabled={!isShowEditButton}
                 />
               </div>
             </div>
@@ -308,6 +326,7 @@ const EditModal = ({ selectedContract, size, onClose, refresh }) => {
                 className="w-full resize-none textarea textarea-bordered"
                 rows={3}
                 {...register("note")}
+                disable={!isShowEditButton}
               />
             </div>
 
